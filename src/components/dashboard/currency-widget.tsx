@@ -7,7 +7,11 @@ import ReactCountryFlag from "react-country-flag";
 import { ArrowRightLeft } from "lucide-react";
 import type { CurrencyRates } from "@/types/dashboard";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+const fetcher = (url: string) =>
+  fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`API error ${r.status}`);
+    return r.json();
+  });
 
 interface RateRowProps {
   countryCode: string;

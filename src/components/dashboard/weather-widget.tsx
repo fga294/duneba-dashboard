@@ -10,7 +10,11 @@ import { formatTemp } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import type { WeatherData } from "@/types/dashboard";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+const fetcher = (url: string) =>
+  fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`API error ${r.status}`);
+    return r.json();
+  });
 
 export function WeatherWidget() {
   const { data, isLoading, error } = useSWR<WeatherData>(

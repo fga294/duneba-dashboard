@@ -10,7 +10,11 @@ import { format, parseISO, isToday, isTomorrow } from "date-fns";
 import { formatEventTime } from "@/lib/utils";
 import type { CalendarEvent } from "@/types/dashboard";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+const fetcher = (url: string) =>
+  fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`API error ${r.status}`);
+    return r.json();
+  });
 
 const EVENT_COLORS: Record<string, string> = {
   default: "bg-blue-500",

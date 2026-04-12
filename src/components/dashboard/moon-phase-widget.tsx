@@ -7,7 +7,11 @@ import { Sunrise, Sunset } from "lucide-react";
 import { getMoonEmoji } from "@/lib/weather-icons";
 import type { WeatherData } from "@/types/dashboard";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+const fetcher = (url: string) =>
+  fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`API error ${r.status}`);
+    return r.json();
+  });
 
 export function MoonPhaseWidget() {
   const { data, isLoading } = useSWR<WeatherData>("/api/weather", fetcher, {

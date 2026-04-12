@@ -10,7 +10,11 @@ import { CheckSquare, Circle, Calendar } from "lucide-react";
 import { format, parseISO, isPast } from "date-fns";
 import type { TaskList } from "@/types/dashboard";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+const fetcher = (url: string) =>
+  fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`API error ${r.status}`);
+    return r.json();
+  });
 
 export function TasksWidget() {
   const { data, isLoading, error } = useSWR<TaskList[]>(
