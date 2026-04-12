@@ -19,9 +19,18 @@ export async function GET() {
   const endOfWeek = new Date(now);
   endOfWeek.setDate(endOfWeek.getDate() + 7);
 
+  const targetName = process.env.CALENDAR_NAME || "Family";
+
   try {
+    // Resolve calendar ID by name (falls back to primary if not found)
+    const calList = await calendar.calendarList.list();
+    const match = calList.data.items?.find(
+      (c) => c.summary === targetName || c.summaryOverride === targetName
+    );
+    const calendarId = match?.id || "primary";
+
     const res = await calendar.events.list({
-      calendarId: "primary",
+      calendarId,
       timeMin: now.toISOString(),
       timeMax: endOfWeek.toISOString(),
       singleEvents: true,
