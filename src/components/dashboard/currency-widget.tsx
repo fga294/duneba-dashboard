@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import ReactCountryFlag from "react-country-flag";
 import { ArrowRightLeft } from "lucide-react";
@@ -21,23 +21,33 @@ interface RateRowProps {
 
 function RateRow({ countryCode, currency, rate }: RateRowProps) {
   return (
-    <div className="flex items-center justify-between rounded-lg bg-secondary/50 px-4 py-3">
+    <div className="group relative flex items-center justify-between overflow-hidden rounded-2xl bg-white/[0.03] px-4 py-3.5 ring-1 ring-white/[0.06] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:bg-white/[0.05] hover:ring-white/[0.1]">
       <div className="flex items-center gap-3">
-        <ReactCountryFlag
-          countryCode={countryCode}
-          svg
-          style={{ width: "1.5em", height: "1.5em" }}
-          aria-label={currency}
-        />
+        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.1] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
+          <ReactCountryFlag
+            countryCode={countryCode}
+            svg
+            style={{ width: "1.75em", height: "1.75em" }}
+            aria-label={currency}
+          />
+        </div>
         <div>
-          <div className="text-sm font-medium">AUD → {currency}</div>
-          <div className="text-xs text-muted-foreground">
-            1 AUD = {rate.toFixed(4)} {currency}
+          <div className="text-sm font-medium text-white">
+            AUD → {currency}
+          </div>
+          <div className="text-[11px] text-white/45 num-tabular font-mono">
+            1 AUD = {rate.toFixed(4)}
           </div>
         </div>
       </div>
-      <div className="text-right">
-        <div className="text-lg font-bold tabular-nums">{rate.toFixed(2)}</div>
+      <div
+        className="font-mono text-xl font-medium text-[color:var(--accent-1)] num-tabular"
+        style={{
+          textShadow: "0 0 24px oklch(0.72 0.18 250 / 0.4)",
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {rate.toFixed(2)}
       </div>
     </div>
   );
@@ -52,10 +62,10 @@ export function CurrencyWidget() {
 
   if (isLoading) {
     return (
-      <Card className="col-span-1">
-        <CardContent className="p-6 space-y-3">
-          <Skeleton className="h-14 w-full" />
-          <Skeleton className="h-14 w-full" />
+      <Card>
+        <CardContent className="space-y-3 py-2">
+          <Skeleton className="h-16 w-full rounded-2xl bg-white/[0.04]" />
+          <Skeleton className="h-16 w-full rounded-2xl bg-white/[0.04]" />
         </CardContent>
       </Card>
     );
@@ -63,8 +73,8 @@ export function CurrencyWidget() {
 
   if (error || !data) {
     return (
-      <Card className="col-span-1">
-        <CardContent className="flex items-center justify-center p-6 text-muted-foreground">
+      <Card>
+        <CardContent className="flex items-center justify-center py-10 text-white/50">
           Rates unavailable
         </CardContent>
       </Card>
@@ -72,17 +82,22 @@ export function CurrencyWidget() {
   }
 
   return (
-    <Card className="col-span-1">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <ArrowRightLeft className="h-4 w-4" />
-          Exchange Rates
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <RateRow countryCode="BR" currency="BRL" rate={data.rates.BRL} />
-        <RateRow countryCode="US" currency="USD" rate={data.rates.USD} />
-        <div className="pt-1 text-[10px] text-muted-foreground text-center">
+    <Card>
+      <CardContent className="flex h-full flex-col py-2">
+        <div className="mb-4 flex items-center gap-2">
+          <ArrowRightLeft
+            className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
+            strokeWidth={1.75}
+          />
+          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
+            Exchange
+          </p>
+        </div>
+        <div className="flex-1 space-y-2.5">
+          <RateRow countryCode="BR" currency="BRL" rate={data.rates.BRL} />
+          <RateRow countryCode="US" currency="USD" rate={data.rates.USD} />
+        </div>
+        <div className="mt-4 text-[10px] uppercase tracking-[0.18em] text-white/35 num-tabular">
           Updated {data.date}
         </div>
       </CardContent>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { sydneyTime } from "@/lib/utils";
-import { Clock, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 export function ClockWidget() {
   const [now, setNow] = useState<Date | null>(null);
@@ -18,24 +18,41 @@ export function ClockWidget() {
   if (!now) return null;
 
   return (
-    <Card className="col-span-1">
-      <CardContent className="flex flex-col items-center justify-center p-6">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-          <MapPin className="h-3 w-3" />
-          <span>Sydney, Australia</span>
+    <Card>
+      <CardContent className="flex h-full flex-col justify-between py-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
+            <MapPin className="h-3 w-3" strokeWidth={1.75} />
+            <span>Sydney · AEST</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inset-0 animate-ping rounded-full bg-[color:var(--accent-1)] opacity-60" />
+              <span className="relative h-1.5 w-1.5 rounded-full bg-[color:var(--accent-1)]" />
+            </span>
+            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/40">
+              Live
+            </span>
+          </div>
         </div>
-        <div className="text-5xl font-bold tabular-nums tracking-tight">
-          {format(now, "HH:mm")}
+        <div className="my-5 flex items-baseline gap-1.5">
+          <span
+            className="font-mono text-[64px] font-medium leading-none text-white num-tabular"
+            style={{ letterSpacing: "-0.04em" }}
+          >
+            {format(now, "HH:mm")}
+          </span>
+          <span className="font-mono text-2xl font-light text-white/45 num-tabular">
+            {format(now, "ss")}
+          </span>
         </div>
-        <div className="text-2xl font-light tabular-nums text-muted-foreground">
-          {format(now, "ss")}
-        </div>
-        <div className="mt-3 text-sm text-muted-foreground">
-          {format(now, "EEEE, d MMMM yyyy")}
-        </div>
-        <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground/60">
-          <Clock className="h-3 w-3" />
-          <span>AEST</span>
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium text-white/70">
+            {format(now, "EEEE")}
+          </div>
+          <div className="text-sm text-white/45 num-tabular">
+            {format(now, "d MMM yyyy")}
+          </div>
         </div>
       </CardContent>
     </Card>
