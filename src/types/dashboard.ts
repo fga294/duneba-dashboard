@@ -52,17 +52,3 @@ export interface CalendarEvent {
   color: string;
   location?: string;
 }
-
-export interface TaskItem {
-  id: string;
-  title: string;
-  status: "needsAction" | "completed";
-  due?: string;
-  notes?: string;
-}
-
-export interface TaskList {
-  id: string;
-  title: string;
-  tasks: TaskItem[];
-}

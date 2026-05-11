@@ -4,16 +4,41 @@ import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center space-y-6">
-        <h1 className="text-4xl font-bold tracking-tight">Duneba Dashboard</h1>
-        <p className="text-muted-foreground">
-          Sign in to access your personal dashboard
-        </p>
-        <button
-          onClick={() => signIn("google", { callbackUrl: "/" })}
-          className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-medium text-gray-900 shadow hover:bg-gray-50"
-        >
+    <div className="flex min-h-screen items-center justify-center px-6">
+      <div className="relative w-full max-w-md overflow-hidden rounded-[28px] bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-150 p-10 text-center ring-1 ring-white/[0.08] shadow-card-lg">
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[inherit]"
+          style={{
+            background:
+              "radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,0.06), transparent 60%)",
+          }}
+          aria-hidden
+        />
+        <div className="relative">
+          <div className="mx-auto mb-5 flex h-10 w-10 items-center justify-center">
+            <div
+              className="h-2.5 w-2.5 rounded-full bg-[color:var(--accent-1)]"
+              style={{
+                boxShadow: "0 0 24px 4px var(--glow-1)",
+              }}
+            />
+          </div>
+          <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[color:var(--accent-1)]">
+            Duneba
+          </p>
+          <h1
+            className="mt-4 text-3xl font-medium text-white"
+            style={{ letterSpacing: "-0.025em" }}
+          >
+            Welcome back.
+          </h1>
+          <p className="mt-2 text-sm text-white/55">
+            Sign in to access your personal dashboard.
+          </p>
+          <button
+            onClick={() => signIn("google", { callbackUrl: "/" })}
+            className="group relative mt-8 inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-white px-6 py-3.5 text-sm font-medium text-black shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.5)] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:scale-[1.02] hover:shadow-[0_12px_48px_-8px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.5)]"
+          >
           <svg className="h-5 w-5" viewBox="0 0 24 24">
             <path
               fill="#4285F4"
@@ -32,8 +57,9 @@ export default function LoginPage() {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          Sign in with Google
+          Continue with Google
         </button>
+        </div>
       </div>
     </div>
   );

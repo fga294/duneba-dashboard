@@ -6,8 +6,11 @@ import type { CalendarEvent } from "@/types/dashboard";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session?.accessToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.accessToken || session.error) {
+    return NextResponse.json(
+      { error: session?.error ?? "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   const oauth2Client = new google.auth.OAuth2();
