@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Droplets, Wind, Thermometer } from "lucide-react";
+import { Droplets, Wind, Thermometer, Cloud } from "lucide-react";
 import { getWeatherIcon } from "@/lib/weather-icons";
 import { formatTemp } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
@@ -55,14 +55,20 @@ export function WeatherWidget() {
   return (
     <Card>
       <CardContent className="py-2">
-        <div className="mb-7 flex items-start justify-between">
+        <div className="mb-5 flex items-start justify-between">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
-              Weather · {data.location}
-            </p>
-            <div className="mt-4 flex items-center gap-5">
+            <div className="flex items-center gap-2">
+              <Cloud
+                className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
+                strokeWidth={1.75}
+              />
+              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
+                Weather · {data.location}
+              </p>
+            </div>
+            <div className="mt-3 flex items-center gap-4">
               <div
-                className="relative flex h-16 w-16 items-center justify-center rounded-2xl"
+                className="relative flex h-12 w-12 items-center justify-center rounded-xl"
                 style={{
                   background:
                     "linear-gradient(135deg, oklch(0.82 0.13 195 / 0.18) 0%, oklch(0.72 0.18 250 / 0.12) 100%)",
@@ -79,18 +85,18 @@ export function WeatherWidget() {
                   aria-hidden
                 />
                 <CurrentIcon
-                  className="relative h-9 w-9 text-[color:var(--accent-2)]"
+                  className="relative h-7 w-7 text-[color:var(--accent-2)]"
                   strokeWidth={1.5}
                 />
               </div>
               <div>
                 <div
-                  className="font-mono text-[72px] font-light leading-none text-white num-tabular"
+                  className="font-mono text-[52px] font-light leading-none text-white num-tabular"
                   style={{ letterSpacing: "-0.05em" }}
                 >
                   {formatTemp(data.current.temp_c)}
                 </div>
-                <div className="mt-1.5 text-sm font-medium text-white/65">
+                <div className="mt-1 text-[13px] font-medium text-white/65">
                   {data.current.condition}
                 </div>
               </div>
@@ -133,13 +139,13 @@ export function WeatherWidget() {
             return (
               <div
                 key={day.date}
-                className="group relative flex flex-col items-center gap-2.5 overflow-hidden rounded-2xl bg-white/[0.03] px-3 py-4 ring-1 ring-white/[0.06] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:bg-white/[0.05] hover:ring-white/[0.1]"
+                className="group relative flex flex-col items-center gap-2 overflow-hidden rounded-xl bg-white/[0.03] px-3 py-3 ring-1 ring-white/[0.06] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:bg-white/[0.05] hover:ring-white/[0.1]"
               >
                 <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
                   {format(parseISO(day.date), "EEE")}
                 </span>
                 <DayIcon
-                  className="h-7 w-7 text-[color:var(--accent-1)]"
+                  className="h-6 w-6 text-[color:var(--accent-1)]"
                   strokeWidth={1.5}
                   style={{
                     filter:
