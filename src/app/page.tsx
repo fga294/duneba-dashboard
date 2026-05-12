@@ -29,7 +29,7 @@ export default function Dashboard() {
   return (
     <main className="min-h-screen px-6 py-8 md:px-10 md:py-10 lg:px-16 lg:py-12">
       <div className="mx-auto max-w-[1400px]">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)] lg:gap-6">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.7fr)] lg:gap-6">
           <div className="flex flex-col gap-5 lg:gap-6">
             <ClockWidget />
             <MoonPhaseWidget />
