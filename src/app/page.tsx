@@ -4,9 +4,10 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { ClockWidget } from "@/components/dashboard/clock-widget";
 import { WeatherWidget } from "@/components/dashboard/weather-widget";
-import { MoonPhaseWidget } from "@/components/dashboard/moon-phase-widget";
 import { CurrencyWidget } from "@/components/dashboard/currency-widget";
 import { CalendarWidget } from "@/components/dashboard/calendar-widget";
+import { FamilyPhotosWidget } from "@/components/dashboard/family-photos-widget";
+import { QuoteWidget } from "@/components/dashboard/quote-widget";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -27,17 +28,18 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="min-h-screen px-6 py-8 md:px-10 md:py-10 lg:px-16 lg:py-12">
-      <div className="mx-auto max-w-[1400px]">
+    <main className="min-h-screen px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
+      <div className="w-full">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.7fr)] lg:gap-6">
           <div className="flex flex-col gap-5 lg:gap-6">
             <ClockWidget />
-            <MoonPhaseWidget />
             <CurrencyWidget />
+            <FamilyPhotosWidget />
           </div>
           <div className="flex flex-col gap-5 lg:gap-6">
             <WeatherWidget />
             <CalendarWidget />
+            <QuoteWidget />
           </div>
         </div>
       </div>

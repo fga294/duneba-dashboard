@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Droplets, Wind, Thermometer, Cloud } from "lucide-react";
+import { Droplets, Wind, Thermometer, Cloud, Sunrise, Sunset } from "lucide-react";
 import { getWeatherIcon } from "@/lib/weather-icons";
 import { formatTemp } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
@@ -25,13 +25,8 @@ export function WeatherWidget() {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="space-y-4 py-2">
-          <Skeleton className="h-28 w-full rounded-2xl bg-white/[0.04]" />
-          <div className="flex gap-3">
-            <Skeleton className="h-28 flex-1 rounded-2xl bg-white/[0.04]" />
-            <Skeleton className="h-28 flex-1 rounded-2xl bg-white/[0.04]" />
-            <Skeleton className="h-28 flex-1 rounded-2xl bg-white/[0.04]" />
-          </div>
+        <CardContent className="py-2">
+          <Skeleton className="h-40 w-full rounded-2xl bg-white/[0.04]" />
         </CardContent>
       </Card>
     );
@@ -51,6 +46,11 @@ export function WeatherWidget() {
     data.current.condition_code,
     data.current.is_day
   );
+
+  const { astronomy } = data;
+  const isWaning = /waning|last quarter/i.test(astronomy.moon_phase);
+  const lit = Math.max(0, Math.min(100, astronomy.moon_illumination)) / 100;
+  const terminator = (1 - lit) * 100;
 
   return (
     <Card>
@@ -102,6 +102,38 @@ export function WeatherWidget() {
               </div>
             </div>
           </div>
+          <div className="flex flex-1 items-end justify-center gap-2 px-4">
+            {data.forecast.map((day) => {
+              const DayIcon = getWeatherIcon(day.condition_code, true);
+              return (
+                <div
+                  key={day.date}
+                  className="group relative flex flex-1 flex-col items-center gap-1 overflow-hidden rounded-lg bg-white/[0.03] px-2 py-2 ring-1 ring-white/[0.06] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:bg-white/[0.05] hover:ring-white/[0.1]"
+                >
+                  <span className="text-[9px] font-medium uppercase tracking-[0.18em] text-white/55">
+                    {format(parseISO(day.date), "EEE")}
+                  </span>
+                  <DayIcon
+                    className="h-4 w-4 text-[color:var(--accent-1)]"
+                    strokeWidth={1.5}
+                    style={{
+                      filter:
+                        "drop-shadow(0 0 8px oklch(0.72 0.18 250 / 0.4))",
+                    }}
+                  />
+                  <div className="flex items-baseline gap-1 font-mono num-tabular">
+                    <span className="text-[11px] font-medium text-white">
+                      {formatTemp(day.maxtemp_c)}
+                    </span>
+                    <span className="text-[10px] text-white/40">
+                      {formatTemp(day.mintemp_c)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
           <div className="flex flex-col gap-2.5 text-xs text-white/55">
             <div className="flex items-center gap-2">
               <Thermometer className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -131,44 +163,74 @@ export function WeatherWidget() {
               </span>
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          {data.forecast.map((day) => {
-            const DayIcon = getWeatherIcon(day.condition_code, true);
-            return (
+          {/* Moon phase + sunrise/sunset */}
+          <div className="ml-4 flex items-center gap-3 border-l border-white/[0.06] pl-4">
+            <div className="relative">
               <div
-                key={day.date}
-                className="group relative flex flex-col items-center gap-2 overflow-hidden rounded-xl bg-white/[0.03] px-3 py-3 ring-1 ring-white/[0.06] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:bg-white/[0.05] hover:ring-white/[0.1]"
+                className="absolute -inset-2 rounded-full opacity-60 blur-lg"
+                style={{
+                  background:
+                    "radial-gradient(closest-side, oklch(0.78 0.12 195 / 0.3), transparent 70%)",
+                }}
+                aria-hidden
+              />
+              <div
+                role="img"
+                aria-label={`${astronomy.moon_phase}, ${astronomy.moon_illumination}% illuminated`}
+                className="relative h-10 w-10 overflow-hidden rounded-full"
+                style={{
+                  background:
+                    "radial-gradient(circle at 30% 30%, oklch(0.95 0.01 250) 0%, oklch(0.78 0.02 250) 55%, oklch(0.55 0.02 250) 100%)",
+                  boxShadow:
+                    "inset 0 0 12px oklch(0 0 0 / 0.35), 0 4px 12px oklch(0 0 0 / 0.4)",
+                }}
               >
-                <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
-                  {format(parseISO(day.date), "EEE")}
-                </span>
-                <DayIcon
-                  className="h-6 w-6 text-[color:var(--accent-1)]"
-                  strokeWidth={1.5}
+                <span
+                  aria-hidden
+                  className="absolute h-1 w-1 rounded-full opacity-30"
+                  style={{ top: "32%", left: "40%", background: "oklch(0 0 0)" }}
+                />
+                <span
+                  aria-hidden
+                  className="absolute h-[3px] w-[3px] rounded-full opacity-25"
+                  style={{ top: "55%", left: "30%", background: "oklch(0 0 0)" }}
+                />
+                <div
+                  aria-hidden
+                  className="absolute inset-0 rounded-full"
                   style={{
-                    filter:
-                      "drop-shadow(0 0 12px oklch(0.72 0.18 250 / 0.45))",
+                    background: "oklch(0.08 0.01 265)",
+                    transform: isWaning
+                      ? `translateX(-${terminator}%)`
+                      : `translateX(${terminator}%)`,
+                    transition: "transform 600ms cubic-bezier(0.2,0.8,0.2,1)",
                   }}
                 />
-                <div className="flex items-baseline gap-1.5 font-mono num-tabular">
-                  <span className="text-sm font-medium text-white">
-                    {formatTemp(day.maxtemp_c)}
-                  </span>
-                  <span className="text-xs text-white/40">
-                    {formatTemp(day.mintemp_c)}
-                  </span>
-                </div>
-                {day.chance_of_rain > 0 && (
-                  <div className="flex items-center gap-1 text-[10px] font-medium text-[color:var(--accent-2)]">
-                    <Droplets className="h-2.5 w-2.5" strokeWidth={1.75} />
-                    <span className="num-tabular">{day.chance_of_rain}%</span>
-                  </div>
-                )}
+                <div
+                  aria-hidden
+                  className="absolute inset-0 rounded-full"
+                  style={{ boxShadow: "inset 0 0 0 0.5px oklch(1 0 0 / 0.18)" }}
+                />
               </div>
-            );
-          })}
+            </div>
+            <div className="flex flex-col gap-1.5 text-[11px] text-white/55">
+              <div className="flex items-center gap-1.5">
+                <Sunrise
+                  className="h-3.5 w-3.5 text-[color:var(--accent-2)]"
+                  strokeWidth={1.5}
+                />
+                <span className="num-tabular">{astronomy.sunrise}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Sunset
+                  className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
+                  strokeWidth={1.5}
+                />
+                <span className="num-tabular">{astronomy.sunset}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
