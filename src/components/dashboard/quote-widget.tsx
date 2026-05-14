@@ -4,60 +4,57 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Quote } from "lucide-react";
 
 const QUOTE = {
-  text: "The only way to do great work is to love what you do.",
-  author: "Steve Jobs",
+  text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
+  author: "Aristotle",
 };
 
 export function QuoteWidget() {
   return (
     <Card>
-      <CardContent className="flex h-full flex-col py-2">
-        <div className="mb-4 flex items-center gap-2">
-          <Quote
-            className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
-            strokeWidth={1.75}
-          />
-          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
-            Quote of the Day
-          </p>
-        </div>
+      <CardContent className="py-2">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 shrink-0">
+            <Quote
+              className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
+              strokeWidth={1.75}
+            />
+            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
+              Quote
+            </p>
+          </div>
 
-        <figure className="flex flex-1 flex-col justify-center gap-3">
+          <span
+            className="h-px flex-shrink-0 w-6"
+            style={{
+              background:
+                "linear-gradient(90deg, oklch(0.72 0.18 250 / 0.5), transparent)",
+            }}
+            aria-hidden
+          />
+
           <blockquote
-            className="text-[18px] font-light leading-snug tracking-tight text-white/90"
-            style={{ textWrap: "balance" }}
+            className="min-w-0 flex-1 truncate text-[13px] font-light italic leading-tight tracking-tight text-white/85"
+            title={`"${QUOTE.text}" — ${QUOTE.author}`}
           >
             <span
               aria-hidden
-              className="mr-1 font-serif text-[28px] leading-none text-[color:var(--accent-2)]"
-              style={{
-                filter: "drop-shadow(0 0 12px oklch(0.82 0.13 195 / 0.4))",
-              }}
+              className="mr-0.5 font-serif text-[15px] leading-none text-[color:var(--accent-2)]"
             >
               &ldquo;
             </span>
             {QUOTE.text}
             <span
               aria-hidden
-              className="ml-1 font-serif text-[28px] leading-none text-[color:var(--accent-2)]"
+              className="ml-0.5 font-serif text-[15px] leading-none text-[color:var(--accent-2)]"
             >
               &rdquo;
             </span>
           </blockquote>
-          <figcaption className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-white/55">
-            <span
-              className="h-px w-6"
-              style={{
-                background:
-                  "linear-gradient(90deg, oklch(0.72 0.18 250 / 0.6), transparent)",
-              }}
-              aria-hidden
-            />
-            <span className="font-medium text-[color:var(--accent-1)]">
-              {QUOTE.author}
-            </span>
-          </figcaption>
-        </figure>
+
+          <span className="shrink-0 text-[10px] font-medium uppercase tracking-[0.22em] text-[color:var(--accent-1)]">
+            {QUOTE.author}
+          </span>
+        </div>
       </CardContent>
     </Card>
   );

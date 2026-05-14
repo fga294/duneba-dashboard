@@ -40,6 +40,7 @@ export interface CurrencyRates {
   rates: {
     BRL: number;
     USD: number;
+    EUR: number;
   };
 }
 

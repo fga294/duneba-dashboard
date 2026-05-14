@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, MapPin } from "lucide-react";
 import { format, isToday, parseISO, startOfDay, addDays } from "date-fns";
 import type { CalendarEvent } from "@/types/dashboard";
 
@@ -94,7 +94,7 @@ export function CalendarWidget() {
   return (
     <Card className="lg:flex-1">
       <CardContent className="flex flex-1 flex-col py-2">
-        <div className="mb-5 flex items-center gap-2">
+        <div className="mb-3 flex items-center gap-2">
           <CalendarDays
             className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
             strokeWidth={1.75}
@@ -140,24 +140,32 @@ export function CalendarWidget() {
           {eventsByDay.map(({ day, timed, allDay }) => (
             <div
               key={day.toISOString()}
-              className="flex flex-col gap-1.5 overflow-hidden rounded-lg bg-white/[0.015] p-1.5 ring-1 ring-white/[0.04]"
+              className="flex flex-col gap-2 overflow-hidden rounded-lg bg-white/[0.015] p-2 ring-1 ring-white/[0.04]"
             >
               {allDay.map((event) => {
                 const color = eventColor(event.color);
                 return (
                   <div
                     key={event.id}
-                    className="relative flex min-h-[68px] flex-col justify-center overflow-hidden rounded-md px-2 py-3 ring-1 ring-white/[0.08]"
+                    className="relative flex min-h-[96px] flex-col justify-center overflow-hidden rounded-lg px-3 py-4 ring-1 ring-white/[0.08]"
                     style={{
                       background: `linear-gradient(135deg, color-mix(in oklch, ${color} 22%, oklch(0.14 0.02 265)) 0%, color-mix(in oklch, ${color} 8%, oklch(0.14 0.02 265)) 100%)`,
                       boxShadow: `inset 2px 0 0 0 ${color}`,
                     }}
                     title={`${event.summary} · All day`}
                   >
-                    <div className="line-clamp-3 pl-1.5 text-[11px] font-medium leading-tight text-white">
+                    <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-white">
                       {event.summary}
                     </div>
-                    <div className="mt-1 pl-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">
+                    {event.location && (
+                      <div className="mt-1 flex items-center gap-1 pl-1.5 text-white/60">
+                        <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                        <span className="truncate text-[11px]" title={event.location}>
+                          {event.location}
+                        </span>
+                      </div>
+                    )}
+                    <div className="mt-1.5 pl-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/50">
                       All day
                     </div>
                   </div>
@@ -171,18 +179,26 @@ export function CalendarWidget() {
                 return (
                   <div
                     key={event.id}
-                    className="group relative overflow-hidden rounded-md ring-1 ring-white/[0.08] transition-all duration-300 hover:ring-white/[0.18]"
+                    className="group relative overflow-hidden rounded-lg ring-1 ring-white/[0.08] transition-all duration-300 hover:ring-white/[0.18]"
                     style={{
                       background: `linear-gradient(135deg, color-mix(in oklch, ${color} 22%, oklch(0.14 0.02 265)) 0%, color-mix(in oklch, ${color} 8%, oklch(0.14 0.02 265)) 100%)`,
                       boxShadow: `inset 2px 0 0 0 ${color}`,
                     }}
                     title={`${event.summary} · ${format(start, "h:mm a")} – ${format(end, "h:mm a")}`}
                   >
-                    <div className="flex min-h-[68px] flex-col justify-center px-2 py-3">
-                      <div className="line-clamp-3 pl-1.5 text-[11px] font-medium leading-tight text-white">
+                    <div className="flex min-h-[96px] flex-col justify-center px-3 py-4">
+                      <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-white">
                         {event.summary}
                       </div>
-                      <div className="mt-1 pl-1.5 truncate font-mono text-[10px] text-white/55 num-tabular">
+                      {event.location && (
+                        <div className="mt-1 flex items-center gap-1 pl-1.5 text-white/60">
+                          <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                          <span className="truncate text-[11px]" title={event.location}>
+                            {event.location}
+                          </span>
+                        </div>
+                      )}
+                      <div className="mt-1.5 pl-1.5 truncate font-mono text-[11px] text-white/60 num-tabular">
                         {format(start, "h:mm a")} – {format(end, "h:mm a")}
                       </div>
                     </div>

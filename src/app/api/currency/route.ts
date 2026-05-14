@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   const res = await fetch(
-    "https://api.frankfurter.app/latest?from=AUD&to=BRL,USD"
+    "https://api.frankfurter.app/latest?from=AUD&to=BRL,USD,EUR"
   );
 
   if (!res.ok) {
@@ -25,6 +25,7 @@ export async function GET() {
     rates: {
       BRL: data.rates.BRL,
       USD: data.rates.USD,
+      EUR: data.rates.EUR,
     },
   };
 
