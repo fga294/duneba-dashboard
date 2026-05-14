@@ -52,3 +52,7 @@ export interface CalendarEvent {
   color: string;
   location?: string;
 }
+
+export interface RandomPhotoResponse {
+  id: string;
+}
