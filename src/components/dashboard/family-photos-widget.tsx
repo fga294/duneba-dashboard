@@ -14,6 +14,8 @@ const fetcher = (url: string) =>
 
 interface Layer {
   id: string;
+  date: string;
+  location: string | null;
   loaded: boolean;
 }
 
@@ -21,7 +23,7 @@ export function FamilyPhotosWidget() {
   const { data, error } = useSWR<RandomPhotoResponse>(
     "/api/photos/random",
     fetcher,
-    { refreshInterval: 30_000, revalidateOnFocus: false }
+    { refreshInterval: 10_000, revalidateOnFocus: false }
   );
 
   const [front, setFront] = useState<Layer | null>(null);
@@ -34,15 +36,21 @@ export function FamilyPhotosWidget() {
     const hidden = showFront ? back : front;
     if (visible?.id === data.id) return;
     if (hidden?.id === data.id) return;
+    const next: Layer = {
+      id: data.id,
+      date: data.date,
+      location: data.location,
+      loaded: false,
+    };
     // setState inside effect is intentional: syncing hidden layer to latest photo id.
     /* eslint-disable react-hooks/set-state-in-effect */
     if (showFront) {
-      setBack({ id: data.id, loaded: false });
+      setBack(next);
     } else {
-      setFront({ id: data.id, loaded: false });
+      setFront(next);
     }
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [data?.id, front, back, showFront]);
+  }, [data?.id, data?.date, data?.location, front, back, showFront]);
 
   const handleLoad = (which: "front" | "back") => {
     if (which === "front") {
@@ -88,24 +96,36 @@ export function FamilyPhotosWidget() {
 
           {/* eslint-disable @next/next/no-img-element */}
           {front && (
-            <img
-              key={`front-${front.id}`}
-              src={`/api/photos/file?id=${front.id}`}
-              alt=""
-              onLoad={() => handleLoad("front")}
-              className="absolute inset-0 h-full w-full object-contain transition-opacity duration-[600ms]"
-              style={{ opacity: showFront && front.loaded ? 1 : 0 }}
-            />
+            <>
+              <img
+                key={`front-img-${front.id}`}
+                src={`/api/photos/file?id=${front.id}`}
+                alt=""
+                onLoad={() => handleLoad("front")}
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[600ms]"
+                style={{ opacity: showFront && front.loaded ? 1 : 0 }}
+              />
+              <PhotoMetaOverlay
+                layer={front}
+                visible={showFront && front.loaded}
+              />
+            </>
           )}
           {back && (
-            <img
-              key={`back-${back.id}`}
-              src={`/api/photos/file?id=${back.id}`}
-              alt=""
-              onLoad={() => handleLoad("back")}
-              className="absolute inset-0 h-full w-full object-contain transition-opacity duration-[600ms]"
-              style={{ opacity: !showFront && back.loaded ? 1 : 0 }}
-            />
+            <>
+              <img
+                key={`back-img-${back.id}`}
+                src={`/api/photos/file?id=${back.id}`}
+                alt=""
+                onLoad={() => handleLoad("back")}
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[600ms]"
+                style={{ opacity: !showFront && back.loaded ? 1 : 0 }}
+              />
+              <PhotoMetaOverlay
+                layer={back}
+                visible={!showFront && back.loaded}
+              />
+            </>
           )}
           {/* eslint-enable @next/next/no-img-element */}
 
@@ -132,5 +152,38 @@ export function FamilyPhotosWidget() {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function PhotoMetaOverlay({
+  layer,
+  visible,
+}: {
+  layer: Layer;
+  visible: boolean;
+}) {
+  return (
+    <div
+      className="pointer-events-none absolute inset-x-0 bottom-0 px-4 pb-3 pt-10 transition-opacity duration-[600ms]"
+      style={{
+        opacity: visible ? 1 : 0,
+        background:
+          "linear-gradient(to top, oklch(0 0 0 / 0.7) 0%, oklch(0 0 0 / 0.35) 45%, transparent 100%)",
+      }}
+    >
+      <div
+        className="flex items-baseline gap-2 text-white"
+        style={{ textShadow: "0 1px 2px oklch(0 0 0 / 0.6)" }}
+      >
+        <span className="text-sm font-medium tracking-tight num-tabular">
+          {layer.date}
+        </span>
+        {layer.location && (
+          <span className="text-sm font-light text-white/80">
+            · {layer.location}
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
