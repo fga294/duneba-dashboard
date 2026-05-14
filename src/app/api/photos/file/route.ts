@@ -8,62 +8,20 @@ import path from "node:path";
 
 const ALLOWED_EXT = /\.(jpe?g|heic)$/i;
 
-/**
- * Validate that `absPath` is safe to serve as a Family Photos image.
- *
- * Two checks the route relies on this function to enforce:
- *   1. PATH SAFETY — `absPath` must live inside `photosDir`. An attacker
- *      who can submit any base64url `id` must not be able to read
- *      `/etc/passwd` or `~/.ssh/id_rsa` by encoding their path.
- *   2. EXTENSION — `absPath` must match `ALLOWED_EXT` (defined above).
- *      Even if path safety passes, we never serve arbitrary files inside
- *      the photo library (e.g. `convert_video.sh` exists in the parent).
- *
- * Three approaches (each ~3–6 lines). Pick one:
- *
- *   A. `path.resolve` + `startsWith` (watch the trailing-separator trap)
- *      ```
- *      const dir = photosDir.endsWith(path.sep) ? photosDir : photosDir + path.sep;
- *      return absPath.startsWith(dir) && ALLOWED_EXT.test(absPath);
- *      ```
- *      Pro: dead simple. Con: easy to mess up the separator and accidentally
- *      accept `/Volumes/home/Photos/PhotoLibraryEvil/...`.
- *
- *   B. `path.relative` (idiomatic)
- *      ```
- *      const rel = path.relative(photosDir, absPath);
- *      return (
- *        rel !== "" &&
- *        !rel.startsWith("..") &&
- *        !path.isAbsolute(rel) &&
- *        ALLOWED_EXT.test(absPath)
- *      );
- *      ```
- *      Pro: no separator pitfalls, reads naturally. Con: 4 conditions to keep right.
- *
- *   C. Allowlist against the live index (strongest)
- *      ```
- *      const index = await getPhotoIndex();
- *      return index.includes(absPath) && ALLOWED_EXT.test(absPath);
- *      ```
- *      Pro: only paths the server itself indexed are allowed — implicitly handles
- *      path traversal AND extension AND existence. Con: adds latency on every
- *      file fetch; couples the route to the index module.
- *
- * Note: both `absPath` and `photosDir` arrive already passed through
- * `path.resolve()` — you can rely on them being absolute and normalized.
- *
- * TODO(user): implement this function. Pick approach A, B, or C above
- * (or your own — but it must satisfy both checks).
- */
+// Security boundary: rejects path-traversal attempts and non-image extensions.
+// `path.relative` returning a "../"-prefixed or absolute path means absPath
+// escapes photosDir, which would let a crafted id read arbitrary files.
 async function isAllowedPhotoPath(
   absPath: string,
   photosDir: string
 ): Promise<boolean> {
-  // TODO(user): implement
-  void absPath;
-  void photosDir;
-  return false;
+  const rel = path.relative(photosDir, absPath);
+  return (
+    rel !== "" &&
+    !rel.startsWith("..") &&
+    !path.isAbsolute(rel) &&
+    ALLOWED_EXT.test(absPath)
+  );
 }
 
 export async function GET(req: Request) {
