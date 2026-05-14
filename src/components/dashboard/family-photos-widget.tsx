@@ -57,7 +57,7 @@ export function FamilyPhotosWidget() {
   const hasAnyPhoto = Boolean(front || back);
 
   return (
-    <Card>
+    <Card className="flex-1">
       <CardContent className="flex h-full flex-col py-2">
         <div className="mb-3 flex items-center gap-2">
           <ImageIcon
@@ -70,7 +70,7 @@ export function FamilyPhotosWidget() {
         </div>
 
         <div
-          className="relative flex-1 overflow-hidden rounded-xl ring-1 ring-white/[0.08]"
+          className="relative flex-1 min-h-[400px] overflow-hidden rounded-xl ring-1 ring-white/[0.08]"
           style={{
             background:
               "linear-gradient(135deg, oklch(0.72 0.18 250 / 0.18) 0%, oklch(0.82 0.13 195 / 0.12) 50%, oklch(0.75 0.14 300 / 0.18) 100%)",
