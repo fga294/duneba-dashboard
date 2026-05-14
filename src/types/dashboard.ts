@@ -55,4 +55,6 @@ export interface CalendarEvent {
 
 export interface RandomPhotoResponse {
   id: string;
+  date: string;
+  location: string | null;
 }

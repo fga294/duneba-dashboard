@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getPhotoIndex } from "@/lib/photo-index";
+import { getPhotoMeta } from "@/lib/photo-meta";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,8 @@ export async function GET() {
     }
     const pick = paths[Math.floor(Math.random() * paths.length)];
     const id = Buffer.from(pick, "utf8").toString("base64url");
-    return NextResponse.json({ id });
+    const meta = await getPhotoMeta(pick);
+    return NextResponse.json({ id, date: meta.date, location: meta.location });
   } catch (err) {
     console.error("Photo index error:", err);
     return NextResponse.json(
