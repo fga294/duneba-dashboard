@@ -1,9 +1,61 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { ImageIcon } from "lucide-react";
+import type { RandomPhotoResponse } from "@/types/dashboard";
+
+const fetcher = (url: string) =>
+  fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`API error ${r.status}`);
+    return r.json();
+  });
+
+interface Layer {
+  id: string;
+  loaded: boolean;
+}
 
 export function FamilyPhotosWidget() {
+  const { data, error } = useSWR<RandomPhotoResponse>(
+    "/api/photos/random",
+    fetcher,
+    { refreshInterval: 30_000, revalidateOnFocus: false }
+  );
+
+  const [front, setFront] = useState<Layer | null>(null);
+  const [back, setBack] = useState<Layer | null>(null);
+  const [showFront, setShowFront] = useState(true);
+
+  useEffect(() => {
+    if (!data?.id) return;
+    const visible = showFront ? front : back;
+    const hidden = showFront ? back : front;
+    if (visible?.id === data.id) return;
+    if (hidden?.id === data.id) return;
+    // setState inside effect is intentional: syncing hidden layer to latest photo id.
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (showFront) {
+      setBack({ id: data.id, loaded: false });
+    } else {
+      setFront({ id: data.id, loaded: false });
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [data?.id, front, back, showFront]);
+
+  const handleLoad = (which: "front" | "back") => {
+    if (which === "front") {
+      setFront((f) => (f ? { ...f, loaded: true } : f));
+      if (!showFront) setShowFront(true);
+    } else {
+      setBack((b) => (b ? { ...b, loaded: true } : b));
+      if (showFront) setShowFront(false);
+    }
+  };
+
+  const hasAnyPhoto = Boolean(front || back);
+
   return (
     <Card>
       <CardContent className="flex h-full flex-col py-2">
@@ -24,7 +76,6 @@ export function FamilyPhotosWidget() {
               "linear-gradient(135deg, oklch(0.72 0.18 250 / 0.18) 0%, oklch(0.82 0.13 195 / 0.12) 50%, oklch(0.75 0.14 300 / 0.18) 100%)",
             boxShadow: "inset 0 1px 0 0 oklch(1 0 0 / 0.08)",
           }}
-          aria-label="Family photo placeholder"
         >
           <div
             className="absolute inset-0 opacity-40"
@@ -34,18 +85,50 @@ export function FamilyPhotosWidget() {
             }}
             aria-hidden
           />
-          <div className="relative flex h-full flex-col items-center justify-center gap-2 text-white/55">
-            <ImageIcon
-              className="h-10 w-10 text-[color:var(--accent-2)]"
-              strokeWidth={1.25}
-              style={{
-                filter: "drop-shadow(0 0 12px oklch(0.82 0.13 195 / 0.45))",
-              }}
+
+          {/* eslint-disable @next/next/no-img-element */}
+          {front && (
+            <img
+              key={`front-${front.id}`}
+              src={`/api/photos/file?id=${front.id}`}
+              alt=""
+              onLoad={() => handleLoad("front")}
+              className="absolute inset-0 h-full w-full object-contain transition-opacity duration-[600ms]"
+              style={{ opacity: showFront && front.loaded ? 1 : 0 }}
             />
-            <span className="text-[11px] font-medium tracking-tight">
-              Placeholder
-            </span>
-          </div>
+          )}
+          {back && (
+            <img
+              key={`back-${back.id}`}
+              src={`/api/photos/file?id=${back.id}`}
+              alt=""
+              onLoad={() => handleLoad("back")}
+              className="absolute inset-0 h-full w-full object-contain transition-opacity duration-[600ms]"
+              style={{ opacity: !showFront && back.loaded ? 1 : 0 }}
+            />
+          )}
+          {/* eslint-enable @next/next/no-img-element */}
+
+          {!hasAnyPhoto && !error && (
+            <div className="relative flex h-full items-center justify-center">
+              <div className="relative h-8 w-8">
+                <div className="absolute inset-0 rounded-full border border-white/[0.08]" />
+                <div className="absolute inset-0 animate-spin rounded-full border border-transparent border-t-[color:var(--accent-1)] [animation-duration:0.9s]" />
+              </div>
+            </div>
+          )}
+
+          {error && !hasAnyPhoto && (
+            <div className="relative flex h-full flex-col items-center justify-center gap-2 text-white/55">
+              <ImageIcon
+                className="h-10 w-10 text-[color:var(--accent-2)]"
+                strokeWidth={1.25}
+              />
+              <span className="text-[11px] font-medium tracking-tight">
+                Photos unavailable
+              </span>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
