@@ -50,3 +50,5 @@ Loading states use the shared `<WidgetSkeleton/>` in `src/components/dashboard/w
 ### Environment variables
 
 Required in `.env.local`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `ALLOWED_EMAIL`, `WEATHERAPI_KEY`, `WEATHER_LOCATION`, `CALENDAR_NAME`.
+
+Optional: `PHOTOS_DIR` (default `/Volumes/home/Photos/PhotoLibrary`). Root directory for the Family Photos widget. Scanned recursively for `.jpg`/`.jpeg`/`.heic` files. HEIC files are transcoded to JPEG on demand via macOS `sips`, so this widget requires the dev server to run on macOS.

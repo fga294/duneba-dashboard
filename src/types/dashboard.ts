@@ -40,6 +40,7 @@ export interface CurrencyRates {
   rates: {
     BRL: number;
     USD: number;
+    EUR: number;
   };
 }
 
@@ -51,4 +52,10 @@ export interface CalendarEvent {
   allDay: boolean;
   color: string;
   location?: string;
+}
+
+export interface RandomPhotoResponse {
+  id: string;
+  date: string;
+  location: string | null;
 }
