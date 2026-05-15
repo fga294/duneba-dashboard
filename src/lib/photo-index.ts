@@ -1,8 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
-const PHOTOS_DIR =
-  process.env.PHOTOS_DIR ?? "/Volumes/home/Photos/PhotoLibrary";
+const PHOTOS_DIR = process.env.PHOTOS_DIR ?? "/Volumes/home/Photos";
 const TTL_MS = 60 * 60 * 1000;
 const ALLOWED_EXT = /\.(jpe?g|heic)$/i;
 

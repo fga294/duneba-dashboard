@@ -51,4 +51,8 @@ Loading states use the shared `<WidgetSkeleton/>` in `src/components/dashboard/w
 
 Required in `.env.local`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `ALLOWED_EMAIL`, `WEATHERAPI_KEY`, `WEATHER_LOCATION`, `CALENDAR_NAME`.
 
-Optional: `PHOTOS_DIR` (default `/Volumes/home/Photos/PhotoLibrary`). Root directory for the Family Photos widget. Scanned recursively for `.jpg`/`.jpeg`/`.heic` files. HEIC files are transcoded to JPEG on demand via macOS `sips`, so this widget requires the dev server to run on macOS.
+`WEATHER_LOCATION` accepts any WeatherAPI query (city name, postcode, IP, lat/lng). For obscure suburbs WeatherAPI may not index by name (e.g. `Westleigh, NSW` only matches the Devon, UK Westleigh), use lat/lng like `-33.7375,151.0697` to snap to the nearest grid point.
+
+Optional: `WEATHER_LOCATION_NAME` overrides the displayed location label. Useful when `WEATHER_LOCATION` is a lat/lng or resolves to a neighbouring suburb's name and you want a different label shown.
+
+Optional: `PHOTOS_DIR` (default `/Volumes/home/Photos`). Root directory for the Family Photos widget. Scanned recursively for `.jpg`/`.jpeg`/`.heic` files. HEIC files are transcoded to JPEG on demand via macOS `sips`, so this widget requires the dev server to run on macOS.

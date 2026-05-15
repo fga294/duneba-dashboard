@@ -19,7 +19,7 @@ export function ClockWidget() {
 
   return (
     <Card>
-      <CardContent className="flex h-full flex-col justify-between py-2">
+      <CardContent className="flex h-full flex-col py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
             <MapPin
@@ -38,23 +38,28 @@ export function ClockWidget() {
             </span>
           </div>
         </div>
-        <div className="my-3 flex items-baseline gap-1.5">
-          <span
-            className="font-mono text-[56px] font-medium leading-none text-white num-tabular"
-            style={{ letterSpacing: "-0.04em" }}
-          >
-            {format(now, "HH:mm")}
-          </span>
-          <span className="font-mono text-xl font-light text-white/45 num-tabular">
-            {format(now, "ss")}
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="text-base font-medium text-white/70">
-            {format(now, "EEEE")}
-          </div>
-          <div className="text-base text-white/45 num-tabular">
-            {format(now, "d MMM yyyy")}
+        <div className="flex flex-1 items-center">
+          <div className="flex w-full items-end justify-between gap-4">
+            <div className="flex items-baseline gap-1.5">
+              <span
+                className="font-mono text-[72px] font-medium leading-none text-white num-tabular"
+                style={{ letterSpacing: "-0.04em" }}
+              >
+                {format(now, "HH:mm")}
+              </span>
+              <span className="font-mono text-2xl font-light text-white/45 num-tabular">
+                {format(now, "ss")}
+              </span>
+            </div>
+            <div className="w-px self-stretch bg-white/[0.08]" aria-hidden />
+            <div className="flex flex-col items-start gap-0.5">
+              <div className="text-base font-medium text-white/70">
+                {format(now, "EEEE")}
+              </div>
+              <div className="text-base text-white/45 num-tabular">
+                {format(now, "d MMM yyyy")}
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
