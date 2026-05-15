@@ -27,12 +27,8 @@ export async function getTranscodedHeic(absPath: string): Promise<Buffer> {
   );
 
   try {
-    await execFileAsync("sips", [
-      "-s", "format", "jpeg",
-      "-s", "formatOptions", "85",
-      absPath,
-      "--out", tmp,
-    ]);
+    // heif-convert picks the output format from the `.jpg` extension.
+    await execFileAsync("heif-convert", ["-q", "85", absPath, tmp]);
     const bytes = await fs.readFile(tmp);
     cache.set(key, bytes);
     if (cache.size > MAX_ENTRIES) {
