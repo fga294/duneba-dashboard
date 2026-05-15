@@ -25,8 +25,8 @@ export function WeatherWidget() {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="py-2">
-          <Skeleton className="h-40 w-full rounded-2xl bg-white/[0.04]" />
+        <CardContent className="flex flex-1 flex-col py-2">
+          <Skeleton className="h-40 w-full flex-1 rounded-2xl bg-white/[0.04]" />
         </CardContent>
       </Card>
     );
@@ -54,7 +54,7 @@ export function WeatherWidget() {
 
   return (
     <Card>
-      <CardContent className="py-1">
+      <CardContent className="flex flex-1 flex-col py-1">
         <div className="mb-1.5 flex items-center gap-2">
           <CloudSun
             className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
@@ -64,7 +64,7 @@ export function WeatherWidget() {
             Weather · {data.location}
           </p>
         </div>
-        <div className="flex items-start justify-between">
+        <div className="flex flex-1 items-center justify-between">
           <div className="flex flex-1 items-center justify-center gap-3 px-2">
             {data.forecast.map((day) => {
               const DayIcon = getWeatherIcon(day.condition_code, true);

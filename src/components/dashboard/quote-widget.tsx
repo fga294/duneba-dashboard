@@ -1,14 +1,75 @@
 "use client";
 
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Quote } from "lucide-react";
+import type { QuoteData } from "@/types/dashboard";
 
-const QUOTE = {
-  text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
-  author: "Aristotle",
+const MAX_FONT_PX = 18;
+const MIN_FONT_PX = 12;
+const REFRESH_MS = 10_000;
+
+const fetcher = async (url: string): Promise<QuoteData> => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch quote");
+  return res.json();
 };
 
+function nextSource(tick: number): "api" | "static" {
+  return tick % 2 === 0 ? "api" : "static";
+}
+
 export function QuoteWidget() {
+  const quoteRef = useRef<HTMLQuoteElement>(null);
+  const [fontPx, setFontPx] = useState(MAX_FONT_PX);
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), REFRESH_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  const source = nextSource(tick);
+
+  const { data, error } = useSWR<QuoteData>(
+    `/api/quote?source=${source}&tick=${tick}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 0,
+    },
+  );
+
+  const quote = data ?? {
+    text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
+    author: "Aristotle",
+    source: "static" as const,
+  };
+
+  useLayoutEffect(() => {
+    const el = quoteRef.current;
+    if (!el) return;
+
+    const fit = () => {
+      let size = MAX_FONT_PX;
+      el.style.fontSize = `${size}px`;
+      while (el.scrollWidth > el.clientWidth && size > MIN_FONT_PX) {
+        size -= 1;
+        el.style.fontSize = `${size}px`;
+      }
+      setFontPx(size);
+    };
+
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [quote.text]);
+
+  const quoteMarkPx = Math.round(fontPx * 1.15);
+
   return (
     <Card>
       <CardContent className="py-2">
@@ -33,26 +94,30 @@ export function QuoteWidget() {
           />
 
           <blockquote
-            className="min-w-0 flex-1 truncate text-[13px] font-light italic leading-tight tracking-tight text-white/85"
-            title={`"${QUOTE.text}" — ${QUOTE.author}`}
+            ref={quoteRef}
+            className="min-w-0 flex-1 truncate font-light italic tracking-tight text-white/85"
+            style={{ fontSize: `${fontPx}px`, lineHeight: "16px" }}
+            title={`"${quote.text}" — ${quote.author}`}
           >
             <span
               aria-hidden
-              className="mr-0.5 font-serif text-[15px] leading-none text-[color:var(--accent-2)]"
+              className="mr-0.5 font-serif leading-none text-[color:var(--accent-2)]"
+              style={{ fontSize: `${quoteMarkPx}px` }}
             >
               &ldquo;
             </span>
-            {QUOTE.text}
+            {error ? "…" : quote.text}
             <span
               aria-hidden
-              className="ml-0.5 font-serif text-[15px] leading-none text-[color:var(--accent-2)]"
+              className="ml-0.5 font-serif leading-none text-[color:var(--accent-2)]"
+              style={{ fontSize: `${quoteMarkPx}px` }}
             >
               &rdquo;
             </span>
           </blockquote>
 
           <span className="shrink-0 text-[10px] font-medium uppercase tracking-[0.22em] text-[color:var(--accent-1)]">
-            {QUOTE.author}
+            {quote.author}
           </span>
         </div>
       </CardContent>
