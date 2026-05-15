@@ -56,7 +56,7 @@ export function CurrencyWidget() {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="space-y-2 py-1.5">
+        <CardContent className="flex flex-1 flex-col gap-2 py-1.5">
           <div className="flex items-center gap-2">
             <ArrowRightLeft
               className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
@@ -86,7 +86,7 @@ export function CurrencyWidget() {
 
   return (
     <Card>
-      <CardContent className="flex flex-col py-1.5">
+      <CardContent className="flex flex-1 flex-col py-1.5">
         <div className="mb-2 flex items-center gap-2">
           <ArrowRightLeft
             className="h-3.5 w-3.5 text-[color:var(--accent-1)]"

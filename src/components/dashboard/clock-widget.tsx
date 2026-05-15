@@ -38,22 +38,22 @@ export function ClockWidget() {
             </span>
           </div>
         </div>
-        <div className="my-5 flex items-baseline gap-1.5">
+        <div className="my-3 flex items-baseline gap-1.5">
           <span
-            className="font-mono text-[64px] font-medium leading-none text-white num-tabular"
+            className="font-mono text-[56px] font-medium leading-none text-white num-tabular"
             style={{ letterSpacing: "-0.04em" }}
           >
             {format(now, "HH:mm")}
           </span>
-          <span className="font-mono text-2xl font-light text-white/45 num-tabular">
+          <span className="font-mono text-xl font-light text-white/45 num-tabular">
             {format(now, "ss")}
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-white/70">
+          <div className="text-base font-medium text-white/70">
             {format(now, "EEEE")}
           </div>
-          <div className="text-sm text-white/45 num-tabular">
+          <div className="text-base text-white/45 num-tabular">
             {format(now, "d MMM yyyy")}
           </div>
         </div>

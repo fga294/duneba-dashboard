@@ -54,6 +54,12 @@ export interface CalendarEvent {
   location?: string;
 }
 
+export interface QuoteData {
+  text: string;
+  author: string;
+  source: "api" | "static";
+}
+
 export interface RandomPhotoResponse {
   id: string;
   date: string;
