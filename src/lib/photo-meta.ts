@@ -35,7 +35,7 @@ interface NominatimResponse {
 
 const rawCache = new Map<string, RawMeta>();
 const geoCache = new Map<string, string | null>();
-const inflightGeo = new Set<string>();
+const inflightGeo = new Map<string, Promise<string | null>>();
 
 const NOMINATIM_RATE_MS = 1100;
 let lastNominatim = 0;
@@ -59,9 +59,7 @@ function extractDate(exif: ExifResult | null, absPath: string, mtimeMs: number):
   return new Date(mtimeMs);
 }
 
-async function geocode(lat: number, lon: number, key: string): Promise<void> {
-  if (inflightGeo.has(key)) return;
-  inflightGeo.add(key);
+async function geocode(lat: number, lon: number, key: string): Promise<string | null> {
   try {
     const wait = NOMINATIM_RATE_MS - (Date.now() - lastNominatim);
     if (wait > 0) await new Promise((r) => setTimeout(r, wait));
@@ -74,7 +72,7 @@ async function geocode(lat: number, lon: number, key: string): Promise<void> {
     });
     if (!res.ok) {
       geoCache.set(key, null);
-      return;
+      return null;
     }
     const data = (await res.json()) as NominatimResponse;
     const addr = data.address ?? {};
@@ -83,11 +81,11 @@ async function geocode(lat: number, lon: number, key: string): Promise<void> {
     const cc = addr.country_code?.toUpperCase() ?? addr.country ?? null;
     const formatted = place && cc ? `${place}, ${cc}` : (place ?? cc ?? null);
     geoCache.set(key, formatted);
+    return formatted;
   } catch (err) {
     console.error("Geocode failed:", err);
     geoCache.set(key, null);
-  } finally {
-    inflightGeo.delete(key);
+    return null;
   }
 }
 
@@ -118,9 +116,13 @@ export async function getPhotoMeta(absPath: string): Promise<PhotoMeta> {
     if (geoCache.has(geoKey)) {
       location = geoCache.get(geoKey) ?? null;
     } else {
-      // Fire-and-forget so the first photo at a new location isn't delayed.
-      // The result populates the cache for subsequent photos near the same spot.
-      void geocode(raw.lat, raw.lon, geoKey);
+      let pending = inflightGeo.get(geoKey);
+      if (!pending) {
+        pending = geocode(raw.lat, raw.lon, geoKey);
+        inflightGeo.set(geoKey, pending);
+        void pending.finally(() => inflightGeo.delete(geoKey));
+      }
+      location = await pending;
     }
   }
 

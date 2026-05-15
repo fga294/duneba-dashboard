@@ -28,7 +28,7 @@ export async function GET() {
   const astronomyData = await astronomyRes.json();
 
   const weather: WeatherData = {
-    location: forecastData.location.name,
+    location: process.env.WEATHER_LOCATION_NAME || forecastData.location.name,
     current: {
       temp_c: forecastData.current.temp_c,
       feelslike_c: forecastData.current.feelslike_c,

@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Droplets, Wind, Thermometer, Sunrise, Sunset, CloudSun } from "lucide-react";
+import { Droplets, Wind, Thermometer, Sunrise, Sunset, CloudSun, Sun } from "lucide-react";
 import { getWeatherIcon } from "@/lib/weather-icons";
 import { formatTemp, tempColor } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
@@ -197,6 +197,15 @@ export function WeatherWidget() {
                 km/h
               </span>
             </div>
+            <div className="flex items-center gap-2">
+              <Sun className="h-4 w-4" strokeWidth={1.5} />
+              <span>
+                UV index{" "}
+                <span className="font-mono text-white/80 num-tabular">
+                  {Math.round(data.current.uv)}
+                </span>
+              </span>
+            </div>
           </div>
 
           {/* Moon phase + sunrise/sunset */}
@@ -267,8 +276,14 @@ export function WeatherWidget() {
               </div>
             </div>
             </div>
-            <div className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/65">
-              {astronomy.moon_phase}
+            <div className="h-px w-full bg-white/[0.08]" aria-hidden />
+            <div className="flex flex-col items-center gap-0.5">
+              <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
+                Moon phase
+              </span>
+              <span className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/65">
+                {astronomy.moon_phase}
+              </span>
             </div>
           </div>
         </div>

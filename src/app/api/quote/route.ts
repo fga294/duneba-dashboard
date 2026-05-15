@@ -18,14 +18,36 @@ const STATIC_QUOTES_PATH = path.join(
   "our-quotes.json",
 );
 
+const API_HISTORY_MAX = 50;
+const API_RETRY = 2;
+
+const apiHistory: string[] = [];
+const staticHistory: string[] = [];
+
+function keyOf(q: { text: string; author: string }): string {
+  return `${q.author}|${q.text}`;
+}
+
+function trim(buf: string[], max: number): void {
+  while (buf.length > max) buf.shift();
+}
+
 async function readStaticQuotes(): Promise<StaticQuote[]> {
   const raw = await fs.readFile(STATIC_QUOTES_PATH, "utf8");
   return JSON.parse(raw) as StaticQuote[];
 }
 
-function pickRandomStatic(quotes: StaticQuote[]): QuoteData {
-  const q = quotes[Math.floor(Math.random() * quotes.length)];
-  return { text: q.q, author: q.a, source: "static" };
+function pickStatic(quotes: StaticQuote[]): QuoteData {
+  const blocked = new Set(staticHistory);
+  const available = quotes.filter(
+    (q) => !blocked.has(keyOf({ text: q.q, author: q.a })),
+  );
+  const pool = available.length > 0 ? available : quotes;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  const result: QuoteData = { text: pick.q, author: pick.a, source: "static" };
+  staticHistory.push(keyOf(result));
+  trim(staticHistory, Math.max(0, quotes.length - 1));
+  return result;
 }
 
 async function fetchFromZenQuotes(): Promise<QuoteData | null> {
@@ -42,6 +64,19 @@ async function fetchFromZenQuotes(): Promise<QuoteData | null> {
   }
 }
 
+async function pickApi(): Promise<QuoteData | null> {
+  for (let attempt = 0; attempt <= API_RETRY; attempt++) {
+    const q = await fetchFromZenQuotes();
+    if (!q) return null;
+    if (!apiHistory.includes(keyOf(q))) {
+      apiHistory.push(keyOf(q));
+      trim(apiHistory, API_HISTORY_MAX);
+      return q;
+    }
+  }
+  return null;
+}
+
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -52,9 +87,9 @@ export async function GET(req: NextRequest) {
   const staticQuotes = await readStaticQuotes();
 
   if (source === "static") {
-    return NextResponse.json(pickRandomStatic(staticQuotes));
+    return NextResponse.json(pickStatic(staticQuotes));
   }
 
-  const apiQuote = await fetchFromZenQuotes();
-  return NextResponse.json(apiQuote ?? pickRandomStatic(staticQuotes));
+  const apiQuote = await pickApi();
+  return NextResponse.json(apiQuote ?? pickStatic(staticQuotes));
 }

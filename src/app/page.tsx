@@ -30,16 +30,14 @@ export default function Dashboard() {
   return (
     <main className="min-h-screen px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
       <div className="w-full">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.7fr)] lg:gap-6 lg:min-h-[calc(100dvh-6rem)]">
-          <div className="flex flex-col gap-5 lg:gap-6">
-            <ClockWidget />
-            <FamilyPhotosWidget />
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.7fr)] lg:grid-rows-[auto_1fr] lg:gap-6 lg:min-h-[calc(100dvh-6rem)]">
+          <ClockWidget />
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,1fr)] lg:gap-6">
+            <WeatherWidget />
+            <CurrencyWidget />
           </div>
+          <FamilyPhotosWidget />
           <div className="flex flex-col gap-5 lg:gap-6">
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,1fr)] lg:gap-6">
-              <WeatherWidget />
-              <CurrencyWidget />
-            </div>
             <CalendarWidget />
             <QuoteWidget />
           </div>

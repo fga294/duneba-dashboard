@@ -17,7 +17,7 @@ const fetcher = async (url: string): Promise<QuoteData> => {
 };
 
 function nextSource(tick: number): "api" | "static" {
-  return tick % 2 === 0 ? "api" : "static";
+  return tick % 3 === 0 ? "static" : "api";
 }
 
 export function QuoteWidget() {
