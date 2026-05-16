@@ -7,6 +7,9 @@ export interface WeatherCurrent {
   wind_kph: number;
   uv: number;
   is_day: boolean;
+  pressure_mb: number;
+  vis_km: number;
+  air_quality_index: number;
 }
 
 export interface ForecastDay {
