@@ -41,7 +41,7 @@ function MoonDisc({ phase, illumination }: MoonProps) {
       <div
         role="img"
         aria-label={`${phase}, ${illumination}% illuminated`}
-        className="relative h-20 w-20 overflow-hidden rounded-full"
+        className="relative h-16 w-16 overflow-hidden rounded-full"
         style={{
           background:
             "radial-gradient(circle at 30% 30%, oklch(0.95 0.01 250) 0%, oklch(0.78 0.02 250) 55%, oklch(0.55 0.02 250) 100%)",
@@ -111,41 +111,41 @@ export function MoonPhaseWidget() {
 
   return (
     <Card>
-      <CardContent className="flex h-full flex-col justify-between py-2">
+      <CardContent className="flex h-full flex-col justify-between py-1.5">
         <div className="flex items-center gap-2">
           <Moon
-            className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
+            className="h-3 w-3 text-[color:var(--accent-1)]"
             strokeWidth={1.75}
           />
-          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
+          <p className="text-[9px] font-medium uppercase tracking-[0.22em] text-white/55">
             Tonight&apos;s Sky
           </p>
         </div>
 
-        <div className="my-3 flex flex-col items-center">
+        <div className="my-2 flex flex-col items-center">
           <MoonDisc
             phase={astronomy.moon_phase}
             illumination={astronomy.moon_illumination}
           />
-          <div className="mt-3 text-sm font-medium tracking-tight text-white">
+          <div className="mt-2 text-[13px] font-medium tracking-tight text-white">
             {astronomy.moon_phase}
           </div>
-          <div className="mt-0.5 text-[11px] text-white/45 num-tabular">
+          <div className="mt-0.5 text-[10px] text-white/45 num-tabular">
             {astronomy.moon_illumination}% illuminated
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-3 text-[11px] text-white/55">
-          <div className="flex items-center gap-1.5">
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-2 text-[10px] text-white/55">
+          <div className="flex items-center gap-1">
             <Sunrise
-              className="h-3.5 w-3.5 text-[color:var(--accent-2)]"
+              className="h-3 w-3 text-[color:var(--accent-2)]"
               strokeWidth={1.5}
             />
             <span className="num-tabular">{astronomy.sunrise}</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             <Sunset
-              className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
+              className="h-3 w-3 text-[color:var(--accent-1)]"
               strokeWidth={1.5}
             />
             <span className="num-tabular">{astronomy.sunset}</span>

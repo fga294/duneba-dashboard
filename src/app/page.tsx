@@ -7,6 +7,7 @@ import { WeatherWidget } from "@/components/dashboard/weather-widget";
 import { CurrencyWidget } from "@/components/dashboard/currency-widget";
 import { CalendarWidget } from "@/components/dashboard/calendar-widget";
 import { FamilyPhotosWidget } from "@/components/dashboard/family-photos-widget";
+import { MoonPhaseWidget } from "@/components/dashboard/moon-phase-widget";
 import { QuoteWidget } from "@/components/dashboard/quote-widget";
 
 export default function Dashboard() {
@@ -34,9 +35,12 @@ export default function Dashboard() {
           <ClockWidget />
           <div className="grid gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,1fr)] lg:gap-6">
             <WeatherWidget />
+            <MoonPhaseWidget />
+          </div>
+          <div className="flex flex-col gap-5 lg:gap-6">
+            <FamilyPhotosWidget />
             <CurrencyWidget />
           </div>
-          <FamilyPhotosWidget />
           <div className="flex flex-col gap-5 lg:gap-6">
             <CalendarWidget />
             <QuoteWidget />

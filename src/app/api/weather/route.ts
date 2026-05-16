@@ -15,7 +15,7 @@ export async function GET() {
   const location = process.env.WEATHER_LOCATION || "Sydney,Australia";
 
   const [forecastRes, astronomyRes] = await Promise.all([
-    fetch(`${WEATHER_API}/forecast.json?key=${key}&q=${location}&days=3&aqi=no`),
+    fetch(`${WEATHER_API}/forecast.json?key=${key}&q=${location}&days=3&aqi=yes`),
     fetch(`${WEATHER_API}/astronomy.json?key=${key}&q=${location}`),
   ]);
 
@@ -38,6 +38,10 @@ export async function GET() {
       wind_kph: forecastData.current.wind_kph,
       uv: forecastData.current.uv,
       is_day: forecastData.current.is_day === 1,
+      pressure_mb: forecastData.current.pressure_mb,
+      vis_km: forecastData.current.vis_km,
+      air_quality_index:
+        forecastData.current.air_quality?.["us-epa-index"] ?? 0,
     },
     forecast: forecastData.forecast.forecastday.map((day: any) => ({
       date: day.date,
