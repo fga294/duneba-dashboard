@@ -8,7 +8,7 @@ import type { QuoteData } from "@/types/dashboard";
 
 const MAX_FONT_PX = 18;
 const MIN_FONT_PX = 12;
-const REFRESH_MS = 10_000;
+const REFRESH_MS = 600_000;
 
 const fetcher = async (url: string): Promise<QuoteData> => {
   const res = await fetch(url);

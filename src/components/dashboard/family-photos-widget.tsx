@@ -23,7 +23,7 @@ export function FamilyPhotosWidget() {
   const { data, error } = useSWR<RandomPhotoResponse>(
     "/api/photos/random",
     fetcher,
-    { refreshInterval: 8_000, revalidateOnFocus: false }
+    { refreshInterval: 12_000, revalidateOnFocus: false }
   );
 
   const [front, setFront] = useState<Layer | null>(null);
