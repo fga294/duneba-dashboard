@@ -55,4 +55,4 @@ Required in `.env.local`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_
 
 Optional: `WEATHER_LOCATION_NAME` overrides the displayed location label. Useful when `WEATHER_LOCATION` is a lat/lng or resolves to a neighbouring suburb's name and you want a different label shown.
 
-Optional: `PHOTOS_DIR` (default `/Volumes/home/Photos`). Root directory for the Family Photos widget. Scanned recursively for `.jpg`/`.jpeg`/`.heic` files. HEIC files are transcoded to JPEG on demand via `heif-convert` (libheif). Install with `brew install libheif` on macOS or `apt install libheif-examples` on Debian/MX-Linux — either platform works for dev and production.
+Optional: `PHOTOS_DIR` (default `/Volumes/home/Photos/PhotoLibrary` on macOS, `/mnt/home/Photos/PhotoLibrary` on Linux). Root directory for the Family Photos widget. Scanned recursively for `.jpg`/`.jpeg`/`.heic` files. HEIC files are transcoded to JPEG on demand via `heif-convert` (libheif). Install with `brew install libheif` on macOS or `apt install libheif-examples` on Debian/MX-Linux — either platform works for dev and production.
