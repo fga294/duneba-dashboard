@@ -9,6 +9,8 @@ import { CalendarWidget } from "@/components/dashboard/calendar-widget";
 import { FamilyPhotosWidget } from "@/components/dashboard/family-photos-widget";
 import { MoonPhaseWidget } from "@/components/dashboard/moon-phase-widget";
 import { QuoteWidget } from "@/components/dashboard/quote-widget";
+import { RelativeTimeWidget } from "@/components/dashboard/relative-time-widget";
+import { NextGameWidget } from "@/components/dashboard/next-game-widget";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -31,19 +33,25 @@ export default function Dashboard() {
   return (
     <main className="min-h-screen px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
       <div className="w-full">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.7fr)] lg:grid-rows-[auto_1fr] lg:gap-6 lg:min-h-[calc(100dvh-6rem)]">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.7fr)] lg:grid-rows-[auto_1fr] lg:gap-4 lg:min-h-[calc(100dvh-6rem)]">
           <ClockWidget />
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,1fr)] lg:gap-6">
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,1fr)] lg:gap-4">
             <WeatherWidget />
             <MoonPhaseWidget />
           </div>
-          <div className="flex flex-col gap-5 lg:gap-6">
+          <div className="flex flex-col gap-3 lg:gap-4">
             <FamilyPhotosWidget />
             <CurrencyWidget />
           </div>
-          <div className="flex flex-col gap-5 lg:gap-6">
-            <CalendarWidget />
-            <QuoteWidget />
+          <div className="flex flex-col gap-3 lg:gap-4">
+            <div className="grid flex-1 gap-3 lg:grid-cols-[minmax(0,1fr)_var(--side-card-w)] lg:gap-4">
+              <CalendarWidget />
+              <RelativeTimeWidget />
+            </div>
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_var(--side-card-w)] lg:gap-4">
+              <QuoteWidget />
+              <NextGameWidget />
+            </div>
           </div>
         </div>
       </div>

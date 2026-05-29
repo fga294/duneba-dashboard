@@ -70,7 +70,7 @@ export function CalendarWidget() {
 
   const events = data || [];
   const today = startOfDay(new Date());
-  const daySlots = Array.from({ length: 5 }, (_, i) => addDays(today, i));
+  const daySlots = Array.from({ length: 4 }, (_, i) => addDays(today, i));
 
   // Partition events for each day; sort timed events ascending by start.
   const eventsByDay = daySlots.map((day) => {
@@ -100,12 +100,12 @@ export function CalendarWidget() {
             strokeWidth={1.75}
           />
           <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
-            Calendar · Next 5 days
+            Calendar · Next 4 days
           </p>
         </div>
 
         {/* Day headers */}
-        <div className="mb-2 grid grid-cols-5 gap-1.5">
+        <div className="mb-2 grid grid-cols-4 gap-1.5">
           {daySlots.map((day) => {
             const h = dayHeader(day);
             return (
@@ -136,7 +136,7 @@ export function CalendarWidget() {
         </div>
 
         {/* Day columns: events stacked top-down, earliest first */}
-        <div className="grid flex-1 grid-cols-5 gap-1.5">
+        <div className="grid flex-1 grid-cols-4 gap-1.5">
           {eventsByDay.map(({ day, timed, allDay }) => (
             <div
               key={day.toISOString()}

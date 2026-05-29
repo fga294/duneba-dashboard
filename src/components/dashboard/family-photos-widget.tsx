@@ -175,12 +175,18 @@ function PhotoMetaOverlay({
         className="flex items-baseline gap-2 text-white"
         style={{ textShadow: "0 1px 2px oklch(0 0 0 / 0.6)" }}
       >
-        <span className="text-sm font-medium tracking-tight num-tabular">
-          {layer.date}
-        </span>
-        {layer.location && (
-          <span className="text-sm font-light text-white/80">
-            · {layer.location}
+        {layer.location ? (
+          <>
+            <span className="min-w-0 truncate text-sm font-light text-white/90">
+              📍 {layer.location}
+            </span>
+            <span className="shrink-0 text-sm font-medium tracking-tight num-tabular text-white/80">
+              · {layer.date}
+            </span>
+          </>
+        ) : (
+          <span className="text-sm font-medium tracking-tight num-tabular">
+            {layer.date}
           </span>
         )}
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { createElement } from "react";
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -56,7 +57,10 @@ export function WeatherWidget() {
     );
   }
 
-  const CurrentIcon = getWeatherIcon(
+  // Lowercase + createElement: getWeatherIcon returns a stable lucide component
+  // from a lookup table, but rendering it as <PascalCase/> from a render-scope
+  // variable trips react-hooks/static-components. This renders it safely.
+  const currentIcon = getWeatherIcon(
     data.current.condition_code,
     data.current.is_day
   );
@@ -170,10 +174,10 @@ export function WeatherWidget() {
                   }}
                   aria-hidden
                 />
-                <CurrentIcon
-                  className="relative h-6 w-6 text-[color:var(--accent-2)]"
-                  strokeWidth={1.5}
-                />
+                {createElement(currentIcon, {
+                  className: "relative h-6 w-6 text-[color:var(--accent-2)]",
+                  strokeWidth: 1.5,
+                })}
               </div>
               <div>
                 <div
