@@ -10,8 +10,9 @@ export function ClockWidget() {
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    setNow(sydneyTime());
-    const interval = setInterval(() => setNow(sydneyTime()), 1000);
+    const tick = () => setNow(sydneyTime());
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, []);
 

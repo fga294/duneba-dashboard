@@ -76,6 +76,11 @@
 
   --radius: 1.25rem;
 
+  /* Shared width for the narrow right-edge cards (Relative Time + Next Brasil
+     Game). Sized to the widest line in Relative Time ("Living in Australia …
+     16,101 days"); both cards reference it so they stay in lockstep. */
+  --side-card-w: 16rem;
+
   /* Glass-edge shadows: inner top highlight + soft floating drop */
   --shadow-card-value:
     inset 0 1px 0 0 oklch(1 0 0 / 0.06),

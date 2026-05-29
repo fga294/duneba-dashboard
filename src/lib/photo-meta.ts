@@ -5,12 +5,14 @@ import exifr from "exifr";
 export interface PhotoMeta {
   date: string;
   location: string | null;
+  veto: boolean;
 }
 
 interface RawMeta {
   date: string;
   lat: number | null;
   lon: number | null;
+  veto: boolean;
 }
 
 interface ExifResult {
@@ -18,6 +20,30 @@ interface ExifResult {
   CreateDate?: Date;
   latitude?: number;
   longitude?: number;
+  // Keyword/tag fields across XMP (dc:subject, lr:hierarchicalSubject) and IPTC.
+  subject?: string | string[];
+  Subject?: string | string[];
+  Keywords?: string | string[];
+  HierarchicalSubject?: string | string[];
+}
+
+const VETO_KEYWORD = "veto";
+
+// True if any XMP/IPTC keyword equals "veto" (case-insensitive). Hierarchical
+// tags like "Family|veto" are split on common separators so the leaf matches.
+function hasVetoKeyword(exif: ExifResult | null): boolean {
+  if (!exif) return false;
+  const tags = [exif.subject, exif.Subject, exif.Keywords, exif.HierarchicalSubject].flatMap(
+    (f) => (Array.isArray(f) ? f : f ? [f] : [])
+  );
+  return tags.some(
+    (v) =>
+      typeof v === "string" &&
+      v
+        .toLowerCase()
+        .split(/[|>/,]/)
+        .some((token) => token.trim() === VETO_KEYWORD)
+  );
 }
 
 interface NominatimResponse {
@@ -97,7 +123,11 @@ export async function getPhotoMeta(absPath: string): Promise<PhotoMeta> {
   if (!raw) {
     let exif: ExifResult | null = null;
     try {
-      exif = (await exifr.parse(absPath, { gps: true })) as ExifResult | null;
+      exif = (await exifr.parse(absPath, {
+        gps: true,
+        xmp: true,
+        iptc: true,
+      })) as ExifResult | null;
     } catch {
       // File has no EXIF, or parser failed — both fine, we have fallbacks.
     }
@@ -106,6 +136,7 @@ export async function getPhotoMeta(absPath: string): Promise<PhotoMeta> {
       date: format(date, "dd-MMM-yyyy"),
       lat: typeof exif?.latitude === "number" ? exif.latitude : null,
       lon: typeof exif?.longitude === "number" ? exif.longitude : null,
+      veto: hasVetoKeyword(exif),
     };
     rawCache.set(rawKey, raw);
   }
@@ -126,5 +157,5 @@ export async function getPhotoMeta(absPath: string): Promise<PhotoMeta> {
     }
   }
 
-  return { date: raw.date, location };
+  return { date: raw.date, location, veto: raw.veto };
 }
