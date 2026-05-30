@@ -21,7 +21,7 @@ interface RateRowProps {
 function RateRow({ countryCode, currency, rate }: RateRowProps) {
   return (
     <div className="flex min-w-0 items-center gap-1.5">
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.1] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
+      <div className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.1] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
         <ReactCountryFlag
           countryCode={countryCode}
           svg
@@ -55,10 +55,10 @@ export function CurrencyWidget() {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="flex h-full items-center justify-around gap-2 px-3 py-3">
-          <Skeleton className="h-6 w-16 rounded-full bg-white/[0.04]" />
-          <Skeleton className="h-6 w-16 rounded-full bg-white/[0.04]" />
-          <Skeleton className="h-6 w-16 rounded-full bg-white/[0.04]" />
+        <CardContent className="flex h-full items-center justify-around gap-2 px-3 py-2">
+          <Skeleton className="h-5 w-16 rounded-full bg-white/[0.04]" />
+          <Skeleton className="h-5 w-16 rounded-full bg-white/[0.04]" />
+          <Skeleton className="h-5 w-16 rounded-full bg-white/[0.04]" />
         </CardContent>
       </Card>
     );
@@ -76,7 +76,7 @@ export function CurrencyWidget() {
 
   return (
     <Card>
-      <CardContent className="flex h-full items-center justify-around gap-2 px-3 py-3">
+      <CardContent className="flex h-full items-center justify-around gap-2 px-3 py-2">
         <RateRow countryCode="BR" currency="BRL" rate={data.rates.BRL} />
         <RateRow countryCode="US" currency="USD" rate={data.rates.USD} />
         <RateRow countryCode="EU" currency="EUR" rate={data.rates.EUR} />

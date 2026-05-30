@@ -10,7 +10,6 @@ import { FamilyPhotosWidget } from "@/components/dashboard/family-photos-widget"
 import { MoonPhaseWidget } from "@/components/dashboard/moon-phase-widget";
 import { QuoteWidget } from "@/components/dashboard/quote-widget";
 import { RelativeTimeWidget } from "@/components/dashboard/relative-time-widget";
-import { NextGameWidget } from "@/components/dashboard/next-game-widget";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -35,7 +34,10 @@ export default function Dashboard() {
       <div className="w-full">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.7fr)] lg:grid-rows-[auto_1fr] lg:gap-4 lg:min-h-[calc(100dvh-6rem)]">
           <ClockWidget />
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,1fr)] lg:gap-4">
+          {/* Weather shares Calendar's grid template, so the main cells are
+              identical 1fr widths of the same column — Weather === Calendar
+              width. Moon snaps to --side-card-w, aligning with Relative Time. */}
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_var(--side-card-w)] lg:gap-4">
             <WeatherWidget />
             <MoonPhaseWidget />
           </div>
@@ -43,15 +45,15 @@ export default function Dashboard() {
             <FamilyPhotosWidget />
             <CurrencyWidget />
           </div>
-          <div className="flex flex-col gap-3 lg:gap-4">
-            <div className="grid flex-1 gap-3 lg:grid-cols-[minmax(0,1fr)_var(--side-card-w)] lg:gap-4">
+          {/* Left cell: Calendar (grows) over Quote. Right cell: Relative Time
+              as one full-height cell, filling the space the Next Brasil Game
+              card used to occupy. */}
+          <div className="grid flex-1 gap-3 lg:grid-cols-[minmax(0,1fr)_var(--side-card-w)] lg:gap-4">
+            <div className="flex min-h-0 flex-col gap-3 lg:gap-4">
               <CalendarWidget />
-              <RelativeTimeWidget />
-            </div>
-            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_var(--side-card-w)] lg:gap-4">
               <QuoteWidget />
-              <NextGameWidget />
             </div>
+            <RelativeTimeWidget />
           </div>
         </div>
       </div>

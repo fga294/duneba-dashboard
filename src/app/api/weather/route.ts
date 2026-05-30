@@ -38,7 +38,6 @@ export async function GET() {
       wind_kph: forecastData.current.wind_kph,
       uv: forecastData.current.uv,
       is_day: forecastData.current.is_day === 1,
-      pressure_mb: forecastData.current.pressure_mb,
       vis_km: forecastData.current.vis_km,
       air_quality_index:
         forecastData.current.air_quality?.["us-epa-index"] ?? 0,

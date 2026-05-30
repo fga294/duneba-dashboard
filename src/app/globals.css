@@ -76,9 +76,11 @@
 
   --radius: 1.25rem;
 
-  /* Shared width for the narrow right-edge cards (Relative Time + Next Brasil
-     Game). Sized to the widest line in Relative Time ("Living in Australia …
-     16,101 days"); both cards reference it so they stay in lockstep. */
+  /* Shared width for the narrow right-edge rail (Moon / Relative Time) and the
+     side track of the Weather and Calendar grids. Sized to the widest line in
+     Relative Time ("Living in Australia … 16,101 days"). Because Weather and
+     Calendar share the same `1fr | --side-card-w` template, they stay the same
+     width in lockstep. */
   --side-card-w: 16rem;
 
   /* Glass-edge shadows: inner top highlight + soft floating drop */
