@@ -21,6 +21,7 @@ const PEOPLE = [
   { emoji: "🧑", name: "Fabricio", dob: new Date(1982, 3, 29) },
   { emoji: "👩", name: "Viviane", dob: new Date(1981, 3, 22) },
   { emoji: "👦", name: "Dimitri", dob: new Date(2012, 0, 2) },
+  { emoji: "🐶", name: "Lola", dob: new Date(2020, 8, 22) },
 ] as const;
 
 const ARRIVAL_AU = new Date(2015, 0, 23);
@@ -32,6 +33,7 @@ const COUNTDOWNS = [
   { emoji: "🎂", label: "Fabricio", month: 4, day: 29 },
   { emoji: "🎂", label: "Viviane", month: 4, day: 22 },
   { emoji: "🎂", label: "Dimitri", month: 1, day: 2 },
+  { emoji: "🎂", label: "Lola", month: 9, day: 22 },
 ] as const;
 
 const fetcher = (url: string) =>
@@ -99,22 +101,23 @@ function Row({
   );
 }
 
-// Single-line transit row: ☉ Sun — Gemini 8°
+// Two-column transit row: [☉ Sun]            [8° Gemini]
+// Symbol + name left-aligned; degree + sign grouped right-aligned. The right
+// group is nowrap so "22° Sagittarius" never breaks across lines.
 function TransitRow({ body }: { body: TransitBody }) {
   return (
-    <div className="flex items-baseline gap-1.5 py-0.5 text-[10px] leading-none">
-      <span className="w-3.5 shrink-0 text-center text-[11px] text-white/70">
-        {body.symbol}
+    <div className="flex items-baseline justify-between gap-2 py-0.5 text-[12px] leading-none">
+      <span className="flex shrink-0 items-baseline gap-1.5">
+        <span className="w-4 shrink-0 text-center text-white/70">
+          {body.symbol}
+        </span>
+        <span className="font-medium text-white/85">{body.name}</span>
       </span>
-      <span className="w-[2.6rem] shrink-0 font-medium text-white/85">
-        {body.name}
-      </span>
-      <span className="shrink-0 text-white/25">—</span>
-      <span className="font-medium text-[color:var(--accent-2)]">
-        {body.sign}
-      </span>
-      <span className="shrink-0 text-[9px] text-white/45 num-tabular">
-        {body.degree}°
+      <span className="flex shrink-0 items-baseline gap-1 whitespace-nowrap">
+        <span className="text-white/45 num-tabular">{body.degree}°</span>
+        <span className="font-medium text-[color:var(--accent-2)]">
+          {body.sign}
+        </span>
       </span>
     </div>
   );
@@ -144,7 +147,7 @@ export function RelativeTimeWidget() {
 
   return (
     <Card>
-      <CardContent className="flex h-full flex-col py-3">
+      <CardContent className="flex h-full flex-col py-4">
         <div className="mb-2 flex items-center gap-2">
           <Hourglass
             className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
@@ -155,7 +158,7 @@ export function RelativeTimeWidget() {
           </p>
         </div>
 
-        <div className="flex flex-1 flex-col justify-between gap-2">
+        <div className="flex flex-1 flex-col justify-center gap-4">
           {/* Time on Earth — hairline marks the end of the section */}
           <div>
             <SectionLabel>Time on Earth</SectionLabel>
