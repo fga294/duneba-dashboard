@@ -1,7 +1,14 @@
 import { promises as fs } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
-const PHOTOS_DIR = process.env.PHOTOS_DIR ?? "/Volumes/home/Photos";
+function defaultPhotosDir(): string {
+  const root =
+    os.platform() === "darwin" ? "/Volumes/home/Photos" : "/mnt/home/Photos";
+  return path.join(root, "PhotoLibrary");
+}
+
+const PHOTOS_DIR = process.env.PHOTOS_DIR ?? defaultPhotosDir();
 const TTL_MS = 60 * 60 * 1000;
 const ALLOWED_EXT = /\.(jpe?g|heic)$/i;
 
