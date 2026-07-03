@@ -33,6 +33,17 @@ function eventColor(colorId: string): string {
   return EVENT_COLORS[colorId] ?? EVENT_COLORS.default;
 }
 
+// Per-event surface: a bold solid left colour bar + colour-tinted glass + a
+// colour-tinted ring, so each event reads as its assigned colour at a glance
+// while the white title text stays legible. Applied uniformly to every event.
+function eventSurface(colorId: string) {
+  const color = eventColor(colorId);
+  return {
+    background: `linear-gradient(135deg, color-mix(in oklch, ${color} 30%, oklch(0.14 0.02 265)) 0%, color-mix(in oklch, ${color} 14%, oklch(0.14 0.02 265)) 100%)`,
+    boxShadow: `inset 4px 0 0 0 ${color}, inset 0 0 0 1px color-mix(in oklch, ${color} 28%, transparent)`,
+  };
+}
+
 function dayHeader(date: Date): { label: string; sub: string; isToday: boolean } {
   return {
     label: isToday(date) ? "Today" : format(date, "EEE"),
@@ -70,7 +81,7 @@ export function CalendarWidget() {
 
   const events = data || [];
   const today = startOfDay(new Date());
-  const daySlots = Array.from({ length: 4 }, (_, i) => addDays(today, i));
+  const daySlots = Array.from({ length: 3 }, (_, i) => addDays(today, i));
 
   // Partition events for each day; sort timed events ascending by start.
   const eventsByDay = daySlots.map((day) => {
@@ -100,12 +111,12 @@ export function CalendarWidget() {
             strokeWidth={1.75}
           />
           <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
-            Calendar · Next 4 days
+            Calendar · Next 3 days
           </p>
         </div>
 
         {/* Day headers */}
-        <div className="mb-2 grid grid-cols-4 gap-1.5">
+        <div className="mb-2 grid grid-cols-3 gap-1.5">
           {daySlots.map((day) => {
             const h = dayHeader(day);
             return (
@@ -136,22 +147,18 @@ export function CalendarWidget() {
         </div>
 
         {/* Day columns: events stacked top-down, earliest first */}
-        <div className="grid flex-1 grid-cols-4 gap-1.5">
+        <div className="grid flex-1 grid-cols-3 gap-1.5">
           {eventsByDay.map(({ day, timed, allDay }) => (
             <div
               key={day.toISOString()}
               className="flex flex-col gap-2 overflow-hidden rounded-lg bg-white/[0.015] p-2 ring-1 ring-white/[0.04]"
             >
               {allDay.map((event) => {
-                const color = eventColor(event.color);
                 return (
                   <div
                     key={event.id}
-                    className="relative flex min-h-[96px] flex-col justify-center overflow-hidden rounded-lg px-3 py-4 ring-1 ring-white/[0.08]"
-                    style={{
-                      background: `linear-gradient(135deg, color-mix(in oklch, ${color} 22%, oklch(0.14 0.02 265)) 0%, color-mix(in oklch, ${color} 8%, oklch(0.14 0.02 265)) 100%)`,
-                      boxShadow: `inset 2px 0 0 0 ${color}`,
-                    }}
+                    className="relative flex min-h-[96px] flex-col justify-center overflow-hidden rounded-lg px-3 py-4"
+                    style={eventSurface(event.color)}
                     title={`${event.summary} · All day`}
                   >
                     <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-white">
@@ -173,17 +180,13 @@ export function CalendarWidget() {
               })}
 
               {timed.map((event) => {
-                const color = eventColor(event.color);
                 const start = parseISO(event.start);
                 const end = parseISO(event.end);
                 return (
                   <div
                     key={event.id}
-                    className="group relative overflow-hidden rounded-lg ring-1 ring-white/[0.08] transition-all duration-300 hover:ring-white/[0.18]"
-                    style={{
-                      background: `linear-gradient(135deg, color-mix(in oklch, ${color} 22%, oklch(0.14 0.02 265)) 0%, color-mix(in oklch, ${color} 8%, oklch(0.14 0.02 265)) 100%)`,
-                      boxShadow: `inset 2px 0 0 0 ${color}`,
-                    }}
+                    className="relative overflow-hidden rounded-lg"
+                    style={eventSurface(event.color)}
                     title={`${event.summary} · ${format(start, "h:mm a")} – ${format(end, "h:mm a")}`}
                   >
                     <div className="flex min-h-[96px] flex-col justify-center px-3 py-4">

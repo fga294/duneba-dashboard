@@ -44,6 +44,17 @@ export interface CurrencyRates {
     USD: number;
     EUR: number;
   };
+  // Sampled last-6-months series per currency (oldest → newest) for sparklines.
+  // Empty arrays when the timeseries fetch is unavailable.
+  history: {
+    BRL: number[];
+    USD: number[];
+    EUR: number[];
+  };
+  // Sampled dates (YYYY-MM-DD, oldest → newest) aligned index-for-index with
+  // `history`, used to label the sparkline's start/end months. Empty when
+  // unavailable.
+  historyDates: string[];
 }
 
 export interface CalendarEvent {
@@ -59,7 +70,6 @@ export interface CalendarEvent {
 export interface QuoteData {
   text: string;
   author: string;
-  source: "api" | "static";
 }
 
 export interface RandomPhotoResponse {

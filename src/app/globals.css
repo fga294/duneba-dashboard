@@ -76,12 +76,12 @@
 
   --radius: 1.25rem;
 
-  /* Shared width for the narrow right-edge rail (Moon / Relative Time) and the
-     side track of the Weather and Calendar grids. Sized to the widest line in
-     Relative Time ("Living in Australia … 16,101 days"). Because Weather and
-     Calendar share the same `1fr | --side-card-w` template, they stay the same
-     width in lockstep. */
-  --side-card-w: 16rem;
+  /* Shared width for the left column (Clock / Photos / Currency), the right-edge
+     rail (Moon / Relative Time), and the side track of the Weather and Calendar
+     grids. Because the outer grid's first column and the inner grids' side track
+     both use this token, columns 1 and 3 stay the same width in lockstep. Tune
+     this single value on the kiosk to taste. */
+  --side-card-w: 27rem;
 
   /* Glass-edge shadows: inner top highlight + soft floating drop */
   --shadow-card-value:

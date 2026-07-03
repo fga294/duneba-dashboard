@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Quote } from "lucide-react";
@@ -8,7 +8,7 @@ import type { QuoteData } from "@/types/dashboard";
 
 const MAX_FONT_PX = 18;
 const MIN_FONT_PX = 12;
-const REFRESH_MS = 600_000;
+const REFRESH_MS = 3_600_000; // 60 minutes
 
 const fetcher = async (url: string): Promise<QuoteData> => {
   const res = await fetch(url);
@@ -16,36 +16,19 @@ const fetcher = async (url: string): Promise<QuoteData> => {
   return res.json();
 };
 
-function nextSource(tick: number): "api" | "static" {
-  return tick % 3 === 0 ? "static" : "api";
-}
-
 export function QuoteWidget() {
   const quoteRef = useRef<HTMLQuoteElement>(null);
   const [fontPx, setFontPx] = useState(MAX_FONT_PX);
-  const [tick, setTick] = useState(0);
 
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), REFRESH_MS);
-    return () => clearInterval(id);
-  }, []);
-
-  const source = nextSource(tick);
-
-  const { data, error } = useSWR<QuoteData>(
-    `/api/quote?source=${source}&tick=${tick}`,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      dedupingInterval: 0,
-    },
-  );
+  const { data } = useSWR<QuoteData>("/api/quote", fetcher, {
+    refreshInterval: REFRESH_MS,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   const quote = data ?? {
     text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
     author: "Aristotle",
-    source: "static" as const,
   };
 
   useLayoutEffect(() => {
@@ -106,7 +89,7 @@ export function QuoteWidget() {
             >
               &ldquo;
             </span>
-            {error ? "…" : quote.text}
+            {quote.text}
             <span
               aria-hidden
               className="ml-0.5 font-serif leading-none text-[color:var(--accent-2)]"

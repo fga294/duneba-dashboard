@@ -4,12 +4,11 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { ClockWidget } from "@/components/dashboard/clock-widget";
 import { WeatherWidget } from "@/components/dashboard/weather-widget";
-import { CurrencyWidget } from "@/components/dashboard/currency-widget";
 import { CalendarWidget } from "@/components/dashboard/calendar-widget";
 import { FamilyPhotosWidget } from "@/components/dashboard/family-photos-widget";
-import { MoonPhaseWidget } from "@/components/dashboard/moon-phase-widget";
+import { MeteorologistsCornerWidget } from "@/components/dashboard/meteorologists-corner-widget";
 import { QuoteWidget } from "@/components/dashboard/quote-widget";
-import { RelativeTimeWidget } from "@/components/dashboard/relative-time-widget";
+import { DataTrackerWidget } from "@/components/dashboard/data-tracker-widget";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -32,28 +31,30 @@ export default function Dashboard() {
   return (
     <main className="min-h-screen px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
       <div className="w-full">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.7fr)] lg:grid-rows-[auto_1fr] lg:gap-4 lg:min-h-[calc(100dvh-6rem)]">
+        <div className="grid gap-3 lg:grid-cols-[var(--side-card-w)_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:gap-4 lg:min-h-[calc(100dvh-6rem)]">
           <ClockWidget />
-          {/* Weather shares Calendar's grid template, so the main cells are
-              identical 1fr widths of the same column — Weather === Calendar
-              width. Moon snaps to --side-card-w, aligning with Relative Time. */}
+          {/* The outer left column uses --side-card-w too, so it matches the
+              right rail (column 1 === column 3). Weather shares Calendar's grid
+              template, so the main cells are identical 1fr widths of the same
+              column — Weather === Calendar width. Meteorologists Corner snaps to
+              --side-card-w, aligning with Data Tracker below it. */}
           <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_var(--side-card-w)] lg:gap-4">
             <WeatherWidget />
-            <MoonPhaseWidget />
+            <MeteorologistsCornerWidget />
           </div>
+          {/* Family Photos now owns the whole cell — it expands to fill the
+              height the Exchange Rate card used to occupy below it. */}
           <div className="flex flex-col gap-3 lg:gap-4">
             <FamilyPhotosWidget />
-            <CurrencyWidget />
           </div>
-          {/* Left cell: Calendar (grows) over Quote. Right cell: Relative Time
-              as one full-height cell, filling the space the Next Brasil Game
-              card used to occupy. */}
+          {/* Left cell: Calendar (grows) over Quote. Right cell: Data Tracker —
+              the consolidation hub — as one full-height cell. */}
           <div className="grid flex-1 gap-3 lg:grid-cols-[minmax(0,1fr)_var(--side-card-w)] lg:gap-4">
             <div className="flex min-h-0 flex-col gap-3 lg:gap-4">
               <CalendarWidget />
               <QuoteWidget />
             </div>
-            <RelativeTimeWidget />
+            <DataTrackerWidget />
           </div>
         </div>
       </div>
