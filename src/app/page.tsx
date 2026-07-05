@@ -27,13 +27,15 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="min-h-screen px-6 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8">
+    <main className="min-h-screen px-8 py-8 md:px-12 md:py-10 lg:px-16 lg:py-12">
       {/* Album Spread layout: a fixtures strip (Clock · slim Weather) above two
           heroes — Family Photos (37.5%) beside Calendar-5-day stacked over the
           rotating Almanac Deck (62.5%). Both rows share the same 3fr/5fr
           template and gaps, so Clock aligns with Photos and Weather with
-          Calendar in lockstep. */}
-      <div className="flex w-full flex-col gap-3 lg:h-[calc(100dvh-4rem)] lg:gap-4">
+          Calendar in lockstep. NOTE: the height calc below subtracts exactly
+          the main element's top+bottom padding (lg:py-12 = 6rem) — keep them
+          in lockstep or the grid overflows the viewport. */}
+      <div className="flex w-full flex-col gap-3 lg:h-[calc(100dvh-6rem)] lg:gap-4">
         <div className="grid shrink-0 gap-3 lg:grid-cols-[3fr_5fr] lg:gap-4">
           <ClockWidget />
           <WeatherWidget />

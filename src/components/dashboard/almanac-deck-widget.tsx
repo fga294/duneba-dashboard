@@ -115,7 +115,7 @@ function monthCode(isoDate: string): string {
 }
 
 const SPARK_W = 138;
-const SPARK_H = 14;
+const SPARK_H = 16;
 
 function Sparkline({ data }: { data: number[] }) {
   if (!data || data.length < 2) {
@@ -165,7 +165,7 @@ function Sparkline({ data }: { data: number[] }) {
 function MonthTick({ label }: { label: string }) {
   if (!label) return null;
   return (
-    <span className="shrink-0 text-[8px] font-medium tracking-[0.1em] text-foreground/45">
+    <span className="shrink-0 text-[9px] font-medium tracking-[0.1em] text-foreground/45">
       {label}
     </span>
   );
@@ -198,15 +198,15 @@ function Row({
   return (
     <div className="flex items-center justify-between gap-2 py-0.5">
       <span className="flex min-w-0 items-center gap-1.5">
-        <span className="text-[12px] leading-none">{icon}</span>
-        <span className="truncate text-[10px] font-medium text-foreground/85">
+        <span className="text-[14px] leading-none">{icon}</span>
+        <span className="truncate text-[12px] font-medium text-foreground/85">
           {label}
         </span>
       </span>
-      <span className="shrink-0 font-mono text-[11px] font-medium text-[color:var(--accent-1)] num-tabular">
+      <span className="shrink-0 font-mono text-[13px] font-medium text-[color:var(--accent-1)] num-tabular">
         {value}
         {unit && (
-          <span className="ml-1 text-[9px] font-normal text-foreground/50">
+          <span className="ml-1 text-[10px] font-normal text-foreground/50">
             {unit}
           </span>
         )}
@@ -234,17 +234,17 @@ function RateRow({
   return (
     <div className="flex items-center justify-between gap-2 py-0.5">
       <span className="flex min-w-0 items-center gap-1.5">
-        <span className="text-[12px] leading-none">
+        <span className="text-[14px] leading-none">
           <Flag code={countryCode} />
         </span>
-        <span className="truncate text-[10px] font-medium text-foreground/85">
+        <span className="truncate text-[12px] font-medium text-foreground/85">
           {currency}
         </span>
       </span>
       <span className="flex items-center gap-1.5">
         <MonthTick label={startLabel} />
         {history.length >= 2 && (
-          <span className="shrink-0 font-mono text-[10px] text-foreground/55 num-tabular">
+          <span className="shrink-0 font-mono text-[11px] text-foreground/55 num-tabular">
             {history[0].toFixed(2)}
           </span>
         )}
@@ -253,7 +253,7 @@ function RateRow({
         {history.length >= 2 && (
           // Direction tick pairs with the trend colour for red-green colour-blind safety.
           <span
-            className="text-[9px] font-bold leading-none"
+            className="text-[10px] font-bold leading-none"
             style={{ color: up ? "var(--trend-up)" : "var(--trend-down)" }}
             aria-hidden
           >
@@ -261,7 +261,7 @@ function RateRow({
           </span>
         )}
       </span>
-      <span className="shrink-0 font-mono text-[11px] font-medium text-[color:var(--accent-1)] num-tabular">
+      <span className="shrink-0 font-mono text-[13px] font-medium text-[color:var(--accent-1)] num-tabular">
         {rate.toFixed(2)}
       </span>
     </div>
@@ -320,7 +320,7 @@ function Stat({
   const left = Math.min(98, Math.max(2, fraction * 100));
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-1.5 text-xs text-foreground/70">
+      <div className="flex items-center gap-1.5 text-[13px] text-foreground/70">
         <Icon
           className="h-4 w-4 shrink-0"
           strokeWidth={1.5}
@@ -354,15 +354,15 @@ function MoonBody({ astronomy }: { astronomy?: WeatherData["astronomy"] }) {
   if (!astronomy) return <Pending />;
   return (
     <div className="flex max-w-[560px] items-center justify-between gap-2 py-0.5">
-      <span className="flex items-center gap-2.5">
-        <span className="text-[40px] leading-none" aria-hidden>
+      <span className="flex items-center gap-3">
+        <span className="text-[48px] leading-none" aria-hidden>
           {moonEmoji(astronomy.moon_phase)}
         </span>
         <span className="flex flex-col">
-          <span className="text-[14px] font-semibold text-foreground">
+          <span className="text-[17px] font-semibold text-foreground">
             {astronomy.moon_phase}
           </span>
-          <span className="text-[9px] text-foreground/55 num-tabular">
+          <span className="text-[11px] text-foreground/55 num-tabular">
             {astronomy.moon_illumination}% illuminated{" "}
             <span className="text-foreground/45">
               (and {moonIncreasing(astronomy.moon_phase) ? "increasing" : "decreasing"})
@@ -370,17 +370,17 @@ function MoonBody({ astronomy }: { astronomy?: WeatherData["astronomy"] }) {
           </span>
         </span>
       </span>
-      <span className="flex flex-col items-end gap-1 text-[10px] text-foreground/60">
-        <span className="flex items-center gap-1">
+      <span className="flex flex-col items-end gap-1.5 text-[12px] text-foreground/60">
+        <span className="flex items-center gap-1.5">
           <Sunrise
-            className="h-3 w-3 text-[color:var(--accent-2)]"
+            className="h-3.5 w-3.5 text-[color:var(--accent-2)]"
             strokeWidth={1.5}
           />
           <span className="num-tabular">{astronomy.sunrise}</span>
         </span>
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1.5">
           <Sunset
-            className="h-3 w-3 text-[color:var(--accent-1)]"
+            className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
             strokeWidth={1.5}
           />
           <span className="num-tabular">{astronomy.sunset}</span>
@@ -473,13 +473,13 @@ function SeasonBody({ today }: { today: Date }) {
   const next = daysUntilNextSeason(today);
   return (
     <div className="flex max-w-[420px] items-center justify-between gap-2 py-0.5">
-      <span className="flex items-center gap-1.5">
-        <span className="text-[14px] leading-none">{season.emoji}</span>
-        <span className="text-[11px] font-semibold text-foreground">
+      <span className="flex items-center gap-2">
+        <span className="text-[20px] leading-none">{season.emoji}</span>
+        <span className="text-[15px] font-semibold text-foreground">
           {season.season}
         </span>
       </span>
-      <span className="text-right text-[10px] leading-tight text-foreground/60">
+      <span className="text-right text-[12px] leading-tight text-foreground/60">
         <span className="font-mono text-[color:var(--accent-1)] num-tabular">
           {next.days}
         </span>{" "}
@@ -548,16 +548,17 @@ function QuoteBody({ quote }: { quote?: QuoteData }) {
     author: "Aristotle",
   };
   return (
-    <div className="flex max-w-[560px] items-start gap-2.5">
+    // Full card width, big type, wrapping to a second line when the quote needs it.
+    <div className="flex items-start gap-3">
       <Quote
-        className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--accent-1)]"
+        className="mt-1 h-5 w-5 shrink-0 text-[color:var(--accent-1)]"
         strokeWidth={1.75}
       />
-      <div className="flex min-w-0 flex-col gap-1">
-        <span className="line-clamp-2 text-[12px] font-light italic leading-snug text-foreground/85">
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <span className="line-clamp-2 text-[21px] font-light italic leading-snug text-foreground/85">
           &ldquo;{q.text}&rdquo;
         </span>
-        <span className="text-[9px] font-medium uppercase tracking-[0.28em] text-[color:var(--accent-1)]">
+        <span className="text-[11px] font-medium uppercase tracking-[0.28em] text-[color:var(--accent-1)]">
           {q.author}
         </span>
       </div>
@@ -566,7 +567,7 @@ function QuoteBody({ quote }: { quote?: QuoteData }) {
 }
 
 function Pending() {
-  return <div className="py-0.5 text-[10px] text-foreground/40">…</div>;
+  return <div className="py-0.5 text-[12px] text-foreground/40">…</div>;
 }
 
 /* --- the deck ----------------------------------------------------------------------- */
@@ -618,14 +619,14 @@ export function AlmanacDeckWidget() {
 
   return (
     // Fixed height: cards differ in natural height and the slot must not jump.
-    <Card className="h-[164px] shrink-0">
+    <Card className="h-[205px] shrink-0">
       <CardContent className="flex h-full flex-col py-4">
         <div className="mb-1.5 flex items-center gap-2">
           <Activity
             className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
             strokeWidth={1.75}
           />
-          <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-foreground/60">
+          <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-foreground/60">
             {card.label}
           </p>
         </div>
