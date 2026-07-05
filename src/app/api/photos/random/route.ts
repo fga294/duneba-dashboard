@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getPhotoIndex } from "@/lib/photo-index";
 import { getPhotoMeta, type PhotoMeta } from "@/lib/photo-meta";
+import { getVetoSet } from "@/lib/photo-vetoes";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +28,12 @@ export async function GET() {
         { status: 503 }
       );
     }
-    // Pick a random photo, skipping any tagged "veto". Track tried indices so we
-    // never re-test the same photo and can stop once the pool is exhausted.
+    // Pick a random photo, skipping any tagged "veto". Two veto sources:
+    // the Synology Photos DB tag (synced set — checked first, no file I/O)
+    // and embedded XMP/IPTC keywords (checked via the EXIF parse we need for
+    // date/location anyway). Track tried indices so we never re-test the same
+    // photo and can stop once the pool is exhausted.
+    const vetoSet = await getVetoSet();
     const tried = new Set<number>();
     let chosen: { pick: string; meta: PhotoMeta } | null = null;
     for (
@@ -40,6 +45,7 @@ export async function GET() {
       if (tried.has(idx)) continue;
       tried.add(idx);
       const pick = paths[idx];
+      if (vetoSet.has(pick)) continue;
       const meta = await getPhotoMeta(pick);
       if (meta.veto) continue;
       chosen = { pick, meta };
