@@ -42,59 +42,59 @@
 }
 
 :root {
-  /* Deep tinted obsidian canvas — pushed darker for stronger card contrast */
-  --background: oklch(0.06 0.015 265);
-  --foreground: oklch(0.97 0.005 250);
-  --surface: oklch(1 0 0 / 0.06);
+  /* ── Almanac theme: warm stone paper + ink, eucalyptus & bronze accents ── */
 
-  /* Aurora accents */
-  --accent-1: oklch(0.72 0.18 250);   /* electric blue */
-  --accent-2: oklch(0.82 0.13 195);   /* cyan aurora */
-  --glow-1: oklch(0.72 0.18 250 / 0.14);
-  --glow-2: oklch(0.82 0.13 195 / 0.1);
+  /* Warm stone canvas (~#F4F1EA) and warm ink (~#262119) */
+  --background: oklch(0.955 0.013 85);
+  --foreground: oklch(0.24 0.012 75);
+  --surface: oklch(0.985 0.007 85);
 
-  /* Hairline (Apple-style 0.5px feel) */
-  --hairline: oklch(1 0 0 / 0.1);
+  /* Accents: eucalyptus (values, live data) + bronze (secondary ticks) */
+  --accent-1: oklch(0.47 0.09 160);   /* eucalyptus ~#2F6649 */
+  --accent-2: oklch(0.5 0.09 65);     /* bronze ~#8A5A2B */
+  --glow-1: oklch(0.47 0.09 160 / 0.14);
+  --glow-2: oklch(0.5 0.09 65 / 0.12);
 
-  /* Shadcn token mapping (dark-first) */
-  --card: oklch(1 0 0 / 0.06);
-  --card-foreground: oklch(0.97 0.005 250);
-  --popover: oklch(0.16 0.02 265);
-  --popover-foreground: oklch(0.97 0.005 250);
-  --primary: oklch(0.72 0.18 250);
-  --primary-foreground: oklch(0.14 0.02 265);
-  --secondary: oklch(1 0 0 / 0.06);
-  --secondary-foreground: oklch(0.97 0.005 250);
-  --muted: oklch(1 0 0 / 0.04);
-  --muted-foreground: oklch(0.66 0.015 260);
-  --accent: oklch(1 0 0 / 0.06);
-  --accent-foreground: oklch(0.97 0.005 250);
-  --destructive: oklch(0.7 0.2 25);
-  --border: oklch(1 0 0 / 0.08);
-  --input: oklch(1 0 0 / 0.08);
-  --ring: oklch(0.72 0.18 250 / 50%);
+  /* Ledger rules & inner chip surfaces */
+  --hairline: oklch(0.885 0.016 82);  /* ~#E3DBC9 */
+  --rule: oklch(0.885 0.016 82);
+  --chip: oklch(0.957 0.013 88);      /* ~#F6F2E9 */
+  --chip-ring: oklch(0.915 0.015 84);
+
+  /* Trend semantics: eucalyptus up, clay down (pair with ▲▼ ticks) */
+  --trend-up: oklch(0.47 0.09 160);
+  --trend-down: oklch(0.5 0.15 30);   /* clay ~#B23A2E */
+
+  /* Paper-fibre noise, shared by the body canvas and each card */
+  --grain-img: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0 0.12 0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+
+  /* Shadcn token mapping (light, warm) */
+  --card: oklch(0.985 0.007 85);      /* paper ~#FCFAF5 */
+  --card-foreground: oklch(0.24 0.012 75);
+  --popover: oklch(0.99 0.005 85);
+  --popover-foreground: oklch(0.24 0.012 75);
+  --primary: oklch(0.47 0.09 160);
+  --primary-foreground: oklch(0.985 0.007 85);
+  --secondary: oklch(0.957 0.013 88);
+  --secondary-foreground: oklch(0.24 0.012 75);
+  --muted: oklch(0.93 0.013 84);
+  --muted-foreground: oklch(0.51 0.02 75); /* warm sub-ink ~#6E6455 */
+  --accent: oklch(0.957 0.013 88);
+  --accent-foreground: oklch(0.24 0.012 75);
+  --destructive: oklch(0.5 0.15 30);
+  --border: oklch(0.9 0.015 82);      /* ~#E6DFD0 */
+  --input: oklch(0.9 0.015 82);
+  --ring: oklch(0.47 0.09 160 / 45%);
 
   --radius: 1.25rem;
 
-  /* Shared width for the left column (Clock / Photos / Currency), the right-edge
-     rail (Moon / Relative Time), and the side track of the Weather and Calendar
-     grids. Because the outer grid's first column and the inner grids' side track
-     both use this token, columns 1 and 3 stay the same width in lockstep. Tune
-     this single value on the kiosk to taste. */
-  --side-card-w: 27rem;
-
-  /* Glass-edge shadows: inner top highlight + soft floating drop */
+  /* Matte paper shadows: soft warm key + ambient, no inset glass highlights */
   --shadow-card-value:
-    inset 0 1px 0 0 oklch(1 0 0 / 0.06),
-    inset 0 0 0 0.5px oklch(1 0 0 / 0.04),
-    0 1px 2px 0 oklch(0 0 0 / 0.3),
-    0 24px 48px -24px oklch(0 0 0 / 0.5);
+    0 1px 2px 0 oklch(0.35 0.04 70 / 0.05),
+    0 12px 30px -8px oklch(0.35 0.04 70 / 0.08);
   --shadow-card-lg-value:
-    inset 0 1px 0 0 oklch(1 0 0 / 0.08),
-    inset 0 0 0 0.5px oklch(1 0 0 / 0.06),
-    0 2px 4px 0 oklch(0 0 0 / 0.35),
-    0 32px 64px -24px oklch(0 0 0 / 0.6),
-    0 0 80px -20px oklch(0.72 0.18 250 / 0.12);
+    0 2px 4px 0 oklch(0.35 0.04 70 / 0.06),
+    0 18px 44px -12px oklch(0.35 0.04 70 / 0.12);
 }
 
 @layer base {
@@ -106,6 +106,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    color-scheme: light;
   }
   body {
     position: relative;
@@ -114,37 +115,35 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
     letter-spacing: -0.011em;
     background:
-      /* aurora glow top-right */
-      radial-gradient(60rem 40rem at 88% -8%, var(--glow-1), transparent 55%),
-      /* aurora glow bottom-left */
-      radial-gradient(50rem 36rem at -8% 108%, var(--glow-2), transparent 60%),
-      /* faint warm rim top-left */
-      radial-gradient(30rem 30rem at 10% 0%, oklch(0.8 0.1 75 / 0.04), transparent 60%),
-      /* base obsidian gradient — deeper for stronger glass contrast */
-      linear-gradient(180deg, oklch(0.07 0.015 265) 0%, oklch(0.04 0.015 270) 100%);
+      /* bronze morning wash, top-right */
+      radial-gradient(60rem 40rem at 88% -8%, var(--glow-2), transparent 55%),
+      /* eucalyptus wash, bottom-left */
+      radial-gradient(50rem 36rem at -8% 108%, var(--glow-1), transparent 60%),
+      /* base warm stone gradient */
+      linear-gradient(180deg, oklch(0.96 0.013 86) 0%, oklch(0.941 0.014 83) 100%);
     background-attachment: fixed;
   }
 
-  /* Tactile grain — SVG fractal noise, fixed to viewport */
+  /* Paper-fibre grain — dark warm noise multiplied onto the stone canvas */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.035;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+    background-image: var(--grain-img);
   }
 
-  /* Subtle vignette to focus the grid */
+  /* Gentle warm vignette to focus the grid (kept far subtler than the dark theme) */
   body::after {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    background: radial-gradient(120% 80% at 50% 40%, transparent 50%, oklch(0 0 0 / 0.4) 100%);
+    background: radial-gradient(120% 80% at 50% 40%, transparent 55%, oklch(0.55 0.05 70 / 0.09) 100%);
   }
 
   /* Lift app content above grain layers */
@@ -155,8 +154,8 @@
 
   /* Custom selection in brand accent */
   ::selection {
-    background: oklch(0.72 0.18 250 / 0.35);
-    color: oklch(0.98 0.005 250);
+    background: oklch(0.47 0.09 160 / 0.2);
+    color: var(--foreground);
   }
 
   /* Refined scrollbar (WebKit) */
@@ -166,23 +165,21 @@
   }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
-    background: oklch(1 0 0 / 0.08);
+    background: oklch(0.3 0.02 75 / 0.16);
     border-radius: 999px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: oklch(1 0 0 / 0.16);
+    background: oklch(0.3 0.02 75 / 0.28);
     background-clip: padding-box;
   }
 }
 
 @layer utilities {
-  /* Glass surface utility */
+  /* Solid paper surface (formerly glass; blur removed with the light theme) */
   .glass-surface {
     background: var(--surface);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
   }
 
   /* Tabular monospaced figures for numbers */
@@ -191,14 +188,14 @@
     font-feature-settings: "tnum", "cv01";
   }
 
-  /* Soft inner highlight on hover (Apple-style) */
+  /* Soft surface lift on hover */
   .glass-hover {
     transition: box-shadow 500ms var(--ease-spring),
                 transform 500ms var(--ease-spring),
                 background 500ms var(--ease-spring);
   }
   .glass-hover:hover {
-    background: oklch(1 0 0 / 0.06);
+    background: oklch(0.99 0.006 85);
   }
 
   @media (prefers-reduced-motion: reduce) {

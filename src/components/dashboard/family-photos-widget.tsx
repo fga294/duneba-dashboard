@@ -23,7 +23,7 @@ export function FamilyPhotosWidget() {
   const { data, error } = useSWR<RandomPhotoResponse>(
     "/api/photos/random",
     fetcher,
-    { refreshInterval: 12_000, revalidateOnFocus: false }
+    { refreshInterval: 20_000, revalidateOnFocus: false }
   );
 
   const [front, setFront] = useState<Layer | null>(null);
@@ -72,24 +72,24 @@ export function FamilyPhotosWidget() {
             className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
             strokeWidth={1.75}
           />
-          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
+          <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-foreground/60">
             Family Photos
           </p>
         </div>
 
         <div
-          className="relative flex-1 min-h-[400px] overflow-hidden rounded-xl ring-1 ring-white/[0.08]"
+          className="relative flex-1 min-h-[400px] overflow-hidden rounded-xl ring-1 ring-black/[0.06]"
           style={{
             background:
-              "linear-gradient(135deg, oklch(0.72 0.18 250 / 0.18) 0%, oklch(0.82 0.13 195 / 0.12) 50%, oklch(0.75 0.14 300 / 0.18) 100%)",
-            boxShadow: "inset 0 1px 0 0 oklch(1 0 0 / 0.08)",
+              "linear-gradient(135deg, oklch(0.93 0.02 85) 0%, oklch(0.91 0.025 140 / 0.6) 50%, oklch(0.92 0.03 60 / 0.6) 100%)",
+            boxShadow: "inset 0 1px 0 0 oklch(1 0 0 / 0.5)",
           }}
         >
           <div
             className="absolute inset-0 opacity-40"
             style={{
               backgroundImage:
-                "radial-gradient(circle at 30% 30%, oklch(1 0 0 / 0.06) 0%, transparent 50%), radial-gradient(circle at 70% 70%, oklch(0.72 0.18 250 / 0.15) 0%, transparent 50%)",
+                "radial-gradient(circle at 30% 30%, oklch(1 0 0 / 0.5) 0%, transparent 50%), radial-gradient(circle at 70% 70%, oklch(0.47 0.09 160 / 0.08) 0%, transparent 50%)",
             }}
             aria-hidden
           />
@@ -132,14 +132,14 @@ export function FamilyPhotosWidget() {
           {!hasAnyPhoto && !error && (
             <div className="relative flex h-full items-center justify-center">
               <div className="relative h-8 w-8">
-                <div className="absolute inset-0 rounded-full border border-white/[0.08]" />
+                <div className="absolute inset-0 rounded-full border border-black/[0.08]" />
                 <div className="absolute inset-0 animate-spin rounded-full border border-transparent border-t-[color:var(--accent-1)] [animation-duration:0.9s]" />
               </div>
             </div>
           )}
 
           {error && !hasAnyPhoto && (
-            <div className="relative flex h-full flex-col items-center justify-center gap-2 text-white/55">
+            <div className="relative flex h-full flex-col items-center justify-center gap-2 text-foreground/60">
               <ImageIcon
                 className="h-10 w-10 text-[color:var(--accent-2)]"
                 strokeWidth={1.25}

@@ -77,11 +77,3 @@ export interface RandomPhotoResponse {
   date: string;
   location: string | null;
 }
-
-export interface TransitBody {
-  name: string;
-  symbol: string;
-  sign: string;
-  degree: number;
-  retrograde: boolean;
-}

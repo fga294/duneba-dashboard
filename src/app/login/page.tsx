@@ -5,13 +5,11 @@ import { signIn } from "next-auth/react";
 export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6">
-      <div className="relative w-full max-w-md overflow-hidden rounded-[28px] bg-white/[0.04] backdrop-blur-2xl backdrop-saturate-150 p-10 text-center ring-1 ring-white/[0.08] shadow-card-lg">
+      <div className="relative w-full max-w-md overflow-hidden rounded-[20px] bg-card p-10 text-center ring-1 ring-border shadow-card-lg">
+        {/* Paper-fibre grain, matching the dashboard cards */}
         <div
-          className="pointer-events-none absolute inset-0 rounded-[inherit]"
-          style={{
-            background:
-              "radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,0.06), transparent 60%)",
-          }}
+          className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-[0.05] mix-blend-multiply"
+          style={{ backgroundImage: "var(--grain-img)" }}
           aria-hidden
         />
         <div className="relative">
@@ -27,17 +25,17 @@ export default function LoginPage() {
             Duneba
           </p>
           <h1
-            className="mt-4 text-3xl font-medium text-white"
+            className="mt-4 text-3xl font-medium text-foreground"
             style={{ letterSpacing: "-0.025em" }}
           >
             Welcome back.
           </h1>
-          <p className="mt-2 text-sm text-white/55">
+          <p className="mt-2 text-sm text-foreground/60">
             Sign in to access your personal dashboard.
           </p>
           <button
             onClick={() => signIn("google", { callbackUrl: "/" })}
-            className="group relative mt-8 inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-white px-6 py-3.5 text-sm font-medium text-black shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.5)] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:scale-[1.02] hover:shadow-[0_12px_48px_-8px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.5)]"
+            className="group relative mt-8 inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-white px-6 py-3.5 text-sm font-medium text-foreground ring-1 ring-border shadow-[0_8px_24px_-8px_rgba(64,52,30,0.25)] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:scale-[1.02] hover:shadow-[0_12px_36px_-8px_rgba(64,52,30,0.35)]"
           >
           <svg className="h-5 w-5" viewBox="0 0 24 24">
             <path

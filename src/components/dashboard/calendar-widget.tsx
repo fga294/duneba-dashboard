@@ -13,34 +13,36 @@ const fetcher = (url: string) =>
     return r.json();
   });
 
-// Google Calendar's 11 color IDs, retuned for dark glass.
+// Google Calendar's 11 color IDs, retuned for warm paper (Almanac light theme):
+// hues keep Google's semantics so the user's colour choices still mean the same,
+// lightness dropped to L≈0.5–0.62 so bars and tints hold on a light surface.
 const EVENT_COLORS: Record<string, string> = {
-  default: "oklch(0.72 0.18 250)",
-  "1": "oklch(0.75 0.14 300)",
-  "2": "oklch(0.78 0.12 150)",
-  "3": "oklch(0.68 0.20 310)",
-  "4": "oklch(0.76 0.17 15)",
-  "5": "oklch(0.85 0.15 90)",
-  "6": "oklch(0.78 0.18 55)",
-  "7": "oklch(0.78 0.13 215)",
-  "8": "oklch(0.7 0.02 265)",
-  "9": "oklch(0.72 0.18 250)",
-  "10": "oklch(0.72 0.15 155)",
-  "11": "oklch(0.72 0.22 25)",
+  default: "oklch(0.5 0.09 160)",
+  "1": "oklch(0.55 0.12 300)",
+  "2": "oklch(0.55 0.1 150)",
+  "3": "oklch(0.5 0.15 310)",
+  "4": "oklch(0.58 0.14 15)",
+  "5": "oklch(0.62 0.11 90)",
+  "6": "oklch(0.58 0.13 55)",
+  "7": "oklch(0.55 0.1 215)",
+  "8": "oklch(0.5 0.015 80)",
+  "9": "oklch(0.5 0.12 260)",
+  "10": "oklch(0.5 0.1 152)",
+  "11": "oklch(0.53 0.17 27)",
 };
 
 function eventColor(colorId: string): string {
   return EVENT_COLORS[colorId] ?? EVENT_COLORS.default;
 }
 
-// Per-event surface: a bold solid left colour bar + colour-tinted glass + a
-// colour-tinted ring, so each event reads as its assigned colour at a glance
-// while the white title text stays legible. Applied uniformly to every event.
+// Per-event surface: a bold solid left colour bar + a colour-washed paper tint
+// + a colour-tinted ring, so each event reads as its assigned colour at a
+// glance while the ink title text stays legible. Applied uniformly to every event.
 function eventSurface(colorId: string) {
   const color = eventColor(colorId);
   return {
-    background: `linear-gradient(135deg, color-mix(in oklch, ${color} 30%, oklch(0.14 0.02 265)) 0%, color-mix(in oklch, ${color} 14%, oklch(0.14 0.02 265)) 100%)`,
-    boxShadow: `inset 4px 0 0 0 ${color}, inset 0 0 0 1px color-mix(in oklch, ${color} 28%, transparent)`,
+    background: `linear-gradient(135deg, color-mix(in oklch, ${color} 16%, #FFFFFF) 0%, color-mix(in oklch, ${color} 7%, #FFFFFF) 100%)`,
+    boxShadow: `inset 4px 0 0 0 ${color}, inset 0 0 0 1px color-mix(in oklch, ${color} 30%, transparent)`,
   };
 }
 
@@ -63,7 +65,7 @@ export function CalendarWidget() {
     return (
       <Card className="lg:flex-1">
         <CardContent className="flex flex-1 flex-col py-2">
-          <Skeleton className="h-full w-full rounded-2xl bg-white/[0.04]" />
+          <Skeleton className="h-full w-full rounded-2xl bg-black/[0.04]" />
         </CardContent>
       </Card>
     );
@@ -72,7 +74,7 @@ export function CalendarWidget() {
   if (error) {
     return (
       <Card className="lg:flex-1">
-        <CardContent className="flex items-center justify-center py-10 text-white/50">
+        <CardContent className="flex items-center justify-center py-10 text-foreground/60">
           Calendar unavailable
         </CardContent>
       </Card>
@@ -81,7 +83,7 @@ export function CalendarWidget() {
 
   const events = data || [];
   const today = startOfDay(new Date());
-  const daySlots = Array.from({ length: 3 }, (_, i) => addDays(today, i));
+  const daySlots = Array.from({ length: 5 }, (_, i) => addDays(today, i));
 
   // Partition events for each day; sort timed events ascending by start.
   const eventsByDay = daySlots.map((day) => {
@@ -110,13 +112,13 @@ export function CalendarWidget() {
             className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
             strokeWidth={1.75}
           />
-          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
-            Calendar · Next 3 days
+          <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-foreground/60">
+            Calendar · Next 5 days
           </p>
         </div>
 
         {/* Day headers */}
-        <div className="mb-2 grid grid-cols-3 gap-1.5">
+        <div className="mb-2 grid grid-cols-5 gap-1.5">
           {daySlots.map((day) => {
             const h = dayHeader(day);
             return (
@@ -128,17 +130,12 @@ export function CalendarWidget() {
                   className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${
                     h.isToday
                       ? "text-[color:var(--accent-1)]"
-                      : "text-white/80"
+                      : "text-foreground/75"
                   }`}
-                  style={
-                    h.isToday
-                      ? { textShadow: "0 0 12px oklch(0.72 0.18 250 / 0.5)" }
-                      : undefined
-                  }
                 >
                   {h.label}
                 </span>
-                <span className="text-[10px] text-white/40 num-tabular">
+                <span className="text-[10px] text-foreground/50 num-tabular">
                   {h.sub}
                 </span>
               </div>
@@ -147,11 +144,11 @@ export function CalendarWidget() {
         </div>
 
         {/* Day columns: events stacked top-down, earliest first */}
-        <div className="grid flex-1 grid-cols-3 gap-1.5">
+        <div className="grid flex-1 grid-cols-5 gap-1.5">
           {eventsByDay.map(({ day, timed, allDay }) => (
             <div
               key={day.toISOString()}
-              className="flex flex-col gap-2 overflow-hidden rounded-lg bg-white/[0.015] p-2 ring-1 ring-white/[0.04]"
+              className="flex flex-col gap-2 overflow-hidden rounded-lg bg-black/[0.02] p-2 ring-1 ring-black/[0.04]"
             >
               {allDay.map((event) => {
                 return (
@@ -161,18 +158,18 @@ export function CalendarWidget() {
                     style={eventSurface(event.color)}
                     title={`${event.summary} · All day`}
                   >
-                    <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-white">
+                    <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-foreground">
                       {event.summary}
                     </div>
                     {event.location && (
-                      <div className="mt-1 flex items-center gap-1 pl-1.5 text-white/60">
+                      <div className="mt-1 flex items-center gap-1 pl-1.5 text-foreground/65">
                         <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
                         <span className="truncate text-[11px]" title={event.location}>
                           {event.location}
                         </span>
                       </div>
                     )}
-                    <div className="mt-1.5 pl-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/50">
+                    <div className="mt-1.5 pl-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-foreground/60">
                       All day
                     </div>
                   </div>
@@ -190,18 +187,18 @@ export function CalendarWidget() {
                     title={`${event.summary} · ${format(start, "h:mm a")} – ${format(end, "h:mm a")}`}
                   >
                     <div className="flex min-h-[96px] flex-col justify-center px-3 py-4">
-                      <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-white">
+                      <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-foreground">
                         {event.summary}
                       </div>
                       {event.location && (
-                        <div className="mt-1 flex items-center gap-1 pl-1.5 text-white/60">
+                        <div className="mt-1 flex items-center gap-1 pl-1.5 text-foreground/65">
                           <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
                           <span className="truncate text-[11px]" title={event.location}>
                             {event.location}
                           </span>
                         </div>
                       )}
-                      <div className="mt-1.5 pl-1.5 truncate font-mono text-[11px] text-white/60 num-tabular">
+                      <div className="mt-1.5 pl-1.5 truncate font-mono text-[11px] text-foreground/65 num-tabular">
                         {format(start, "h:mm a")} – {format(end, "h:mm a")}
                       </div>
                     </div>
@@ -210,7 +207,7 @@ export function CalendarWidget() {
               })}
 
               {timed.length === 0 && allDay.length === 0 && (
-                <div className="flex flex-1 items-center justify-center text-[10px] text-white/25">
+                <div className="flex flex-1 items-center justify-center text-[10px] text-foreground/35">
                   —
                 </div>
               )}

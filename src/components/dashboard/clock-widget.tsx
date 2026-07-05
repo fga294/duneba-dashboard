@@ -22,7 +22,7 @@ export function ClockWidget() {
     <Card>
       <CardContent className="relative flex h-full items-end justify-center pt-1.5 pb-3">
         <div className="pointer-events-none absolute inset-x-6 top-2 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.22em] text-white/55">
+          <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.28em] text-foreground/60">
             <MapPin
               className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
               strokeWidth={1.75}
@@ -34,7 +34,7 @@ export function ClockWidget() {
               <span className="absolute inset-0 animate-ping rounded-full bg-[color:var(--accent-1)] opacity-60" />
               <span className="relative h-1.5 w-1.5 rounded-full bg-[color:var(--accent-1)]" />
             </span>
-            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/40">
+            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-foreground/50">
               Live
             </span>
           </div>
@@ -43,16 +43,16 @@ export function ClockWidget() {
           <div className="flex w-full flex-col items-center gap-1">
             <div className="flex items-baseline gap-2">
               <span
-                className="font-mono text-[90px] font-medium leading-none text-white num-tabular"
+                className="font-mono text-[90px] font-medium leading-none text-foreground num-tabular"
                 style={{ letterSpacing: "-0.04em" }}
               >
                 {format(now, "HH:mm")}
               </span>
-              <span className="font-mono text-[28px] font-light leading-none text-white/45 num-tabular">
+              <span className="font-mono text-[28px] font-light leading-none text-foreground/55 num-tabular">
                 {format(now, "ss")}
               </span>
             </div>
-            <div className="whitespace-nowrap text-base font-medium text-white/65 num-tabular">
+            <div className="whitespace-nowrap text-base font-medium text-foreground/70 num-tabular">
               {format(now, "EEEE d MMMM yyyy")}
             </div>
           </div>
