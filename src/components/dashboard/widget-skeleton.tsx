@@ -10,11 +10,11 @@ export function WidgetSkeleton({ className, lines = 3 }: WidgetSkeletonProps) {
   return (
     <Card className={className}>
       <CardHeader className="pb-2">
-        <Skeleton className="h-4 w-24 bg-black/[0.04]" />
+        <Skeleton className="h-4 w-24 bg-white/[0.05]" />
       </CardHeader>
       <CardContent className="space-y-3">
         {Array.from({ length: lines }).map((_, i) => (
-          <Skeleton key={i} className="h-10 w-full bg-black/[0.04]" />
+          <Skeleton key={i} className="h-10 w-full bg-white/[0.05]" />
         ))}
       </CardContent>
     </Card>

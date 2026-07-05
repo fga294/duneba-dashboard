@@ -15,7 +15,7 @@ export default function Dashboard() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="relative h-10 w-10">
-          <div className="absolute inset-0 rounded-full border border-black/[0.08]" />
+          <div className="absolute inset-0 rounded-full border border-white/[0.1]" />
           <div className="absolute inset-0 animate-spin rounded-full border border-transparent border-t-[color:var(--accent-1)] [animation-duration:0.9s]" />
         </div>
       </div>

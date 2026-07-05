@@ -27,7 +27,7 @@ export function WeatherWidget() {
     return (
       <Card>
         <CardContent className="flex flex-1 flex-col py-2">
-          <Skeleton className="h-40 w-full flex-1 rounded-2xl bg-black/[0.04]" />
+          <Skeleton className="h-40 w-full flex-1 rounded-2xl bg-white/[0.05]" />
         </CardContent>
       </Card>
     );
@@ -73,7 +73,7 @@ export function WeatherWidget() {
               return (
                 <div
                   key={day.date}
-                  className="group relative flex items-center gap-2 overflow-hidden rounded-lg bg-[color:var(--chip)] px-3 py-2.5 ring-1 ring-[color:var(--chip-ring)] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:bg-[oklch(0.945_0.014_86)] hover:ring-[color:var(--border)]"
+                  className="group relative flex items-center gap-2 overflow-hidden rounded-lg bg-[color:var(--chip)] px-3 py-2.5 ring-1 ring-[color:var(--chip-ring)] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:bg-[oklch(0.33_0.006_250)] hover:ring-[oklch(0.42_0.006_250)]"
                 >
                   <DayIcon
                     className="h-12 w-12 shrink-0 text-[color:var(--accent-2)]"
@@ -121,7 +121,7 @@ export function WeatherWidget() {
                         </div>
                       </div>
                       <div
-                        className="w-px self-stretch bg-black/[0.1]"
+                        className="w-px self-stretch bg-white/[0.1]"
                         aria-hidden
                       />
                       <span className="line-clamp-2 max-w-[12ch] self-center text-[11px] leading-tight capitalize text-foreground/70">
@@ -140,8 +140,9 @@ export function WeatherWidget() {
               className="relative flex h-10 w-10 items-center justify-center rounded-xl"
               style={{
                 background:
-                  "linear-gradient(135deg, color-mix(in oklch, var(--accent-2) 14%, white) 0%, color-mix(in oklch, var(--accent-1) 10%, white) 100%)",
-                boxShadow: "inset 0 0 0 1px oklch(0.89 0.018 84)",
+                  "linear-gradient(135deg, color-mix(in oklch, var(--accent-2) 22%, oklch(0.27 0.005 250)) 0%, color-mix(in oklch, var(--accent-1) 16%, oklch(0.27 0.005 250)) 100%)",
+                boxShadow:
+                  "inset 0 0 0 1px oklch(0.36 0.006 250), inset 0 1px 0 oklch(1 0 0 / 0.08)",
               }}
             >
               {createElement(currentIcon, {

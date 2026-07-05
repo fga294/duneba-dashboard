@@ -26,21 +26,21 @@ export function formatTemp(temp: number): string {
   return `${Math.round(temp)}°`;
 }
 
-// Maps °C to a perceptually-uniform OKLCH color: violet at extreme cold,
-// indigo → slate blue → teal → eucalyptus → olive-gold → amber → clay red.
+// Maps °C to a perceptually-uniform OKLCH color: deep purple at extreme cold,
+// blue → cyan → green → yellow → orange → bright red at extreme heat.
 // Stops chosen for "how a person would feel," not for evenly-spaced math.
-// Light-theme (Almanac) ramp: L≈0.45–0.58 so temps hold ~4:1 on warm paper
-// (the old bright-on-black values washed out entirely on a light surface).
+// Dark-theme (Gunmetal) ramp: bright L≈0.65–0.86 values that carry against
+// charcoal metal (the light ramp's L≈0.5 values go muddy on dark surfaces).
 type TempStop = readonly [tempC: number, l: number, c: number, h: number];
 const TEMP_STOPS: readonly TempStop[] = [
-  [-10, 0.45, 0.14, 300],
-  [0, 0.47, 0.12, 275],
-  [10, 0.5, 0.1, 245],
-  [16, 0.52, 0.09, 200],
-  [20, 0.52, 0.1, 155],
-  [25, 0.58, 0.11, 95],
-  [30, 0.56, 0.14, 55],
-  [38, 0.5, 0.17, 30],
+  [-10, 0.65, 0.18, 320],
+  [0, 0.7, 0.18, 300],
+  [10, 0.74, 0.17, 275],
+  [16, 0.78, 0.14, 210],
+  [20, 0.8, 0.16, 150],
+  [25, 0.86, 0.17, 95],
+  [30, 0.76, 0.19, 50],
+  [38, 0.68, 0.23, 25],
 ];
 
 export function tempColor(tempC: number): string {

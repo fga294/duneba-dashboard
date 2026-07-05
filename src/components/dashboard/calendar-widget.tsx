@@ -13,35 +13,36 @@ const fetcher = (url: string) =>
     return r.json();
   });
 
-// Google Calendar's 11 color IDs, retuned for warm paper (Almanac light theme):
+// Google Calendar's 11 color IDs, retuned for gunmetal (dark metal theme):
 // hues keep Google's semantics so the user's colour choices still mean the same,
-// lightness dropped to L≈0.5–0.62 so bars and tints hold on a light surface.
+// lightness lifted to L≈0.68–0.85 so bars and tints glow against dark metal.
+// Default = ember, matching the theme's indicator-lamp accent.
 const EVENT_COLORS: Record<string, string> = {
-  default: "oklch(0.5 0.09 160)",
-  "1": "oklch(0.55 0.12 300)",
-  "2": "oklch(0.55 0.1 150)",
-  "3": "oklch(0.5 0.15 310)",
-  "4": "oklch(0.58 0.14 15)",
-  "5": "oklch(0.62 0.11 90)",
-  "6": "oklch(0.58 0.13 55)",
-  "7": "oklch(0.55 0.1 215)",
-  "8": "oklch(0.5 0.015 80)",
-  "9": "oklch(0.5 0.12 260)",
-  "10": "oklch(0.5 0.1 152)",
-  "11": "oklch(0.53 0.17 27)",
+  default: "oklch(0.75 0.13 70)",
+  "1": "oklch(0.75 0.14 300)",
+  "2": "oklch(0.78 0.12 150)",
+  "3": "oklch(0.68 0.2 310)",
+  "4": "oklch(0.76 0.17 15)",
+  "5": "oklch(0.85 0.15 90)",
+  "6": "oklch(0.78 0.18 55)",
+  "7": "oklch(0.78 0.13 215)",
+  "8": "oklch(0.7 0.02 265)",
+  "9": "oklch(0.72 0.13 260)",
+  "10": "oklch(0.72 0.15 155)",
+  "11": "oklch(0.72 0.22 25)",
 };
 
 function eventColor(colorId: string): string {
   return EVENT_COLORS[colorId] ?? EVENT_COLORS.default;
 }
 
-// Per-event surface: a bold solid left colour bar + a colour-washed paper tint
+// Per-event surface: a bold solid left colour bar + a colour-washed metal tint
 // + a colour-tinted ring, so each event reads as its assigned colour at a
-// glance while the ink title text stays legible. Applied uniformly to every event.
+// glance while the steel-white title stays legible. Applied uniformly to every event.
 function eventSurface(colorId: string) {
   const color = eventColor(colorId);
   return {
-    background: `linear-gradient(135deg, color-mix(in oklch, ${color} 16%, #FFFFFF) 0%, color-mix(in oklch, ${color} 7%, #FFFFFF) 100%)`,
+    background: `linear-gradient(135deg, color-mix(in oklch, ${color} 26%, oklch(0.24 0.005 250)) 0%, color-mix(in oklch, ${color} 12%, oklch(0.24 0.005 250)) 100%)`,
     boxShadow: `inset 4px 0 0 0 ${color}, inset 0 0 0 1px color-mix(in oklch, ${color} 30%, transparent)`,
   };
 }
@@ -65,7 +66,7 @@ export function CalendarWidget() {
     return (
       <Card className="lg:flex-1">
         <CardContent className="flex flex-1 flex-col py-2">
-          <Skeleton className="h-full w-full rounded-2xl bg-black/[0.04]" />
+          <Skeleton className="h-full w-full rounded-2xl bg-white/[0.05]" />
         </CardContent>
       </Card>
     );
@@ -148,7 +149,7 @@ export function CalendarWidget() {
           {eventsByDay.map(({ day, timed, allDay }) => (
             <div
               key={day.toISOString()}
-              className="flex flex-col gap-2 overflow-hidden rounded-lg bg-black/[0.02] p-2 ring-1 ring-black/[0.04]"
+              className="flex flex-col gap-2 overflow-hidden rounded-lg bg-white/[0.02] p-2 ring-1 ring-white/[0.05]"
             >
               {allDay.map((event) => {
                 return (

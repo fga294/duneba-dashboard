@@ -173,7 +173,7 @@ function MonthTick({ label }: { label: string }) {
 
 function Flag({ code }: { code: string }) {
   return (
-    <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-black/[0.1]">
+    <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.15]">
       <ReactCountryFlag
         countryCode={code}
         svg
@@ -271,16 +271,16 @@ function RateRow({
 /* --- weather gauge primitives (formerly Meteorologists Corner) ------------------ */
 
 // US EPA index: 1 Good, 2 Moderate, 3 Unhealthy (sensitive), 4 Unhealthy, 5 Very Unhealthy, 6 Hazardous
-// Light-tuned for warm paper: same hue semantics, dropped lightness for contrast.
+// Dark-tuned for gunmetal: bright hues carry the semantics against dark metal.
 const AQI_LABELS = ["—", "Good", "Mod", "Unhlth*", "Unhlth", "V.Unhlth", "Hazard"];
 const AQI_COLORS = [
-  "oklch(0.5 0.01 80 / 0.8)",
-  "oklch(0.52 0.13 150)",
-  "oklch(0.58 0.12 95)",
-  "oklch(0.56 0.13 60)",
-  "oklch(0.5 0.17 30)",
-  "oklch(0.45 0.16 340)",
-  "oklch(0.38 0.14 25)",
+  "oklch(0.65 0 0 / 0.7)",
+  "oklch(0.78 0.16 145)",
+  "oklch(0.85 0.15 95)",
+  "oklch(0.78 0.16 60)",
+  "oklch(0.7 0.2 25)",
+  "oklch(0.6 0.22 340)",
+  "oklch(0.5 0.18 25)",
 ];
 const aqiLabel = (i: number) => AQI_LABELS[i] ?? "—";
 const aqiColor = (i: number) => AQI_COLORS[i] ?? AQI_COLORS[0];
@@ -339,8 +339,8 @@ function Stat({
         style={{ background: `linear-gradient(to right, ${gradient})` }}
       >
         <span
-          className="absolute top-1/2 h-[7px] w-[2px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color:var(--foreground)]"
-          style={{ left: `${left}%`, boxShadow: "0 0 0 1.5px oklch(0.985 0.007 85)" }}
+          className="absolute top-1/2 h-[7px] w-[2px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
+          style={{ left: `${left}%`, boxShadow: "0 0 4px oklch(0 0 0 / 0.7)" }}
           aria-hidden
         />
       </div>
