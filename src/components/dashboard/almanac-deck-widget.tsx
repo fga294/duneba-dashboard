@@ -23,8 +23,8 @@ import {
   currentSeason,
   daysSince,
   daysUntil,
-  daysUntilNextSeason,
   nextAnniversary,
+  upcomingSeasons,
 } from "@/lib/relative-time";
 import type {
   CurrencyRates,
@@ -114,8 +114,8 @@ function monthCode(isoDate: string): string {
   return MONTHS[Number(isoDate.slice(5, 7)) - 1] ?? "";
 }
 
-const SPARK_W = 138;
-const SPARK_H = 16;
+const SPARK_W = 170;
+const SPARK_H = 20;
 
 function Sparkline({ data }: { data: number[] }) {
   if (!data || data.length < 2) {
@@ -165,7 +165,7 @@ function Sparkline({ data }: { data: number[] }) {
 function MonthTick({ label }: { label: string }) {
   if (!label) return null;
   return (
-    <span className="shrink-0 text-[9px] font-medium tracking-[0.1em] text-foreground/45">
+    <span className="shrink-0 text-[11px] font-medium tracking-[0.1em] text-foreground/45">
       {label}
     </span>
   );
@@ -173,11 +173,11 @@ function MonthTick({ label }: { label: string }) {
 
 function Flag({ code }: { code: string }) {
   return (
-    <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.15]">
+    <span className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.15]">
       <ReactCountryFlag
         countryCode={code}
         svg
-        style={{ width: "1.1em", height: "1.1em" }}
+        style={{ width: "1.5em", height: "1.5em" }}
         aria-label={code}
       />
     </span>
@@ -198,15 +198,15 @@ function Row({
   return (
     <div className="flex items-center justify-between gap-2 py-0.5">
       <span className="flex min-w-0 items-center gap-1.5">
-        <span className="text-[14px] leading-none">{icon}</span>
-        <span className="truncate text-[12px] font-medium text-foreground/85">
+        <span className="text-[18px] leading-none">{icon}</span>
+        <span className="truncate text-[15px] font-medium text-foreground/85">
           {label}
         </span>
       </span>
-      <span className="shrink-0 font-mono text-[13px] font-medium text-[color:var(--accent-1)] num-tabular">
+      <span className="shrink-0 font-mono text-[16px] font-medium text-[color:var(--accent-1)] num-tabular">
         {value}
         {unit && (
-          <span className="ml-1 text-[10px] font-normal text-foreground/50">
+          <span className="ml-1 text-[12px] font-normal text-foreground/50">
             {unit}
           </span>
         )}
@@ -234,17 +234,17 @@ function RateRow({
   return (
     <div className="flex items-center justify-between gap-2 py-0.5">
       <span className="flex min-w-0 items-center gap-1.5">
-        <span className="text-[14px] leading-none">
+        <span className="text-[18px] leading-none">
           <Flag code={countryCode} />
         </span>
-        <span className="truncate text-[12px] font-medium text-foreground/85">
+        <span className="truncate text-[15px] font-medium text-foreground/85">
           {currency}
         </span>
       </span>
       <span className="flex items-center gap-1.5">
         <MonthTick label={startLabel} />
         {history.length >= 2 && (
-          <span className="shrink-0 font-mono text-[11px] text-foreground/55 num-tabular">
+          <span className="shrink-0 font-mono text-[13px] text-foreground/55 num-tabular">
             {history[0].toFixed(2)}
           </span>
         )}
@@ -253,7 +253,7 @@ function RateRow({
         {history.length >= 2 && (
           // Direction tick pairs with the trend colour for red-green colour-blind safety.
           <span
-            className="text-[10px] font-bold leading-none"
+            className="text-[12px] font-bold leading-none"
             style={{ color: up ? "var(--trend-up)" : "var(--trend-down)" }}
             aria-hidden
           >
@@ -261,7 +261,7 @@ function RateRow({
           </span>
         )}
       </span>
-      <span className="shrink-0 font-mono text-[13px] font-medium text-[color:var(--accent-1)] num-tabular">
+      <span className="shrink-0 font-mono text-[16px] font-medium text-[color:var(--accent-1)] num-tabular">
         {rate.toFixed(2)}
       </span>
     </div>
@@ -320,9 +320,9 @@ function Stat({
   const left = Math.min(98, Math.max(2, fraction * 100));
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-1.5 text-[13px] text-foreground/70">
+      <div className="flex items-center gap-2 text-[15px] text-foreground/70">
         <Icon
-          className="h-4 w-4 shrink-0"
+          className="h-5 w-5 shrink-0"
           strokeWidth={1.5}
           style={color ? { color } : undefined}
         />
@@ -335,11 +335,11 @@ function Stat({
         </span>
       </div>
       <div
-        className="relative h-[3px] w-full rounded-full opacity-90"
+        className="relative h-[4px] w-full rounded-full opacity-90"
         style={{ background: `linear-gradient(to right, ${gradient})` }}
       >
         <span
-          className="absolute top-1/2 h-[7px] w-[2px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
+          className="absolute top-1/2 h-[9px] w-[2px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
           style={{ left: `${left}%`, boxShadow: "0 0 4px oklch(0 0 0 / 0.7)" }}
           aria-hidden
         />
@@ -353,16 +353,16 @@ function Stat({
 function MoonBody({ astronomy }: { astronomy?: WeatherData["astronomy"] }) {
   if (!astronomy) return <Pending />;
   return (
-    <div className="flex max-w-[560px] items-center justify-between gap-2 py-0.5">
-      <span className="flex items-center gap-3">
-        <span className="text-[48px] leading-none" aria-hidden>
+    <div className="flex max-w-[680px] items-center justify-between gap-2 py-0.5">
+      <span className="flex items-center gap-4">
+        <span className="text-[64px] leading-none" aria-hidden>
           {moonEmoji(astronomy.moon_phase)}
         </span>
         <span className="flex flex-col">
-          <span className="text-[17px] font-semibold text-foreground">
+          <span className="text-[22px] font-semibold text-foreground">
             {astronomy.moon_phase}
           </span>
-          <span className="text-[11px] text-foreground/55 num-tabular">
+          <span className="text-[13px] text-foreground/55 num-tabular">
             {astronomy.moon_illumination}% illuminated{" "}
             <span className="text-foreground/45">
               (and {moonIncreasing(astronomy.moon_phase) ? "increasing" : "decreasing"})
@@ -370,19 +370,21 @@ function MoonBody({ astronomy }: { astronomy?: WeatherData["astronomy"] }) {
           </span>
         </span>
       </span>
-      <span className="flex flex-col items-end gap-1.5 text-[12px] text-foreground/60">
-        <span className="flex items-center gap-1.5">
+      <span className="flex flex-col items-end gap-2 text-[14px] text-foreground/60">
+        <span className="flex items-center gap-2">
           <Sunrise
-            className="h-3.5 w-3.5 text-[color:var(--accent-2)]"
+            className="h-4 w-4 text-[color:var(--accent-2)]"
             strokeWidth={1.5}
           />
+          <span className="text-foreground/45">Sunrise</span>
           <span className="num-tabular">{astronomy.sunrise}</span>
         </span>
-        <span className="flex items-center gap-1.5">
+        <span className="flex items-center gap-2">
           <Sunset
-            className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
+            className="h-4 w-4 text-[color:var(--accent-1)]"
             strokeWidth={1.5}
           />
+          <span className="text-foreground/45">Sunset</span>
           <span className="num-tabular">{astronomy.sunset}</span>
         </span>
       </span>
@@ -398,7 +400,7 @@ function FxBody({ currency }: { currency?: CurrencyRates }) {
     ? monthCode(histDates[histDates.length - 1])
     : "";
   return (
-    <div className="max-w-[560px]">
+    <div className="max-w-[680px]">
       <RateRow
         countryCode="BR"
         currency="BRL"
@@ -429,7 +431,7 @@ function FxBody({ currency }: { currency?: CurrencyRates }) {
 
 function TimeBody({ today }: { today: Date }) {
   return (
-    <div className="grid max-w-[560px] grid-cols-2 gap-x-8">
+    <div className="grid max-w-[680px] grid-cols-2 gap-x-10">
       {PEOPLE.map((p) => (
         <Row
           key={p.name}
@@ -451,7 +453,7 @@ function TimeBody({ today }: { today: Date }) {
 
 function CountdownBody({ today }: { today: Date }) {
   return (
-    <div className="grid max-w-[560px] grid-cols-2 gap-x-8">
+    <div className="grid max-w-[680px] grid-cols-2 gap-x-10">
       {COUNTDOWNS.map((c) => {
         const d = daysUntil(nextAnniversary(c.month, c.day, today), today);
         return (
@@ -470,22 +472,42 @@ function CountdownBody({ today }: { today: Date }) {
 
 function SeasonBody({ today }: { today: Date }) {
   const season = currentSeason(today);
-  const next = daysUntilNextSeason(today);
+  // Soonest season is the headline; the rest of the cycle sits small on the right.
+  const [next, ...later] = upcomingSeasons(today);
   return (
-    <div className="flex max-w-[420px] items-center justify-between gap-2 py-0.5">
-      <span className="flex items-center gap-2">
-        <span className="text-[20px] leading-none">{season.emoji}</span>
-        <span className="text-[15px] font-semibold text-foreground">
-          {season.season}
+    <div className="flex max-w-[680px] items-center justify-between gap-6 py-0.5">
+      {/* Current season is the star; the countdown rides beside it as support. */}
+      <span className="flex items-center gap-3">
+        <span className="text-[42px] leading-none" aria-hidden>
+          {season.emoji}
+        </span>
+        <span className="flex items-baseline gap-3">
+          <span className="text-[27px] font-semibold leading-none text-foreground">
+            {season.season}
+          </span>
+          <span className="flex items-baseline gap-1.5 text-[14px] text-foreground/60">
+            <span className="text-[15px] leading-none" aria-hidden>
+              {next.emoji}
+            </span>
+            <span className="font-mono text-[color:var(--accent-1)] num-tabular">
+              {next.days}
+            </span>{" "}
+            days until {next.season}
+          </span>
         </span>
       </span>
-      <span className="text-right text-[12px] leading-tight text-foreground/60">
-        <span className="font-mono text-[color:var(--accent-1)] num-tabular">
-          {next.days}
-        </span>{" "}
-        days
-        <br />
-        <span className="text-foreground/50">until {next.next}</span>
+      <span className="flex shrink-0 flex-col gap-1.5 text-[13px] text-foreground/60">
+        {later.map((s) => (
+          <span key={s.season} className="flex items-center gap-1.5">
+            <span className="text-[15px] leading-none" aria-hidden>
+              {s.emoji}
+            </span>
+            <span className="font-mono text-[color:var(--accent-1)] num-tabular">
+              {s.days}
+            </span>{" "}
+            days until {s.season}
+          </span>
+        ))}
       </span>
     </div>
   );
@@ -494,7 +516,7 @@ function SeasonBody({ today }: { today: Date }) {
 function GaugesBody({ current }: { current?: WeatherCurrent }) {
   if (!current) return <Pending />;
   return (
-    <div className="grid grid-cols-3 gap-x-6 gap-y-2.5">
+    <div className="grid grid-cols-3 gap-x-8 gap-y-3.5">
       <Stat
         icon={Thermometer}
         label="Feels"
@@ -567,7 +589,7 @@ function QuoteBody({ quote }: { quote?: QuoteData }) {
 }
 
 function Pending() {
-  return <div className="py-0.5 text-[12px] text-foreground/40">…</div>;
+  return <div className="py-0.5 text-[14px] text-foreground/40">…</div>;
 }
 
 /* --- the deck ----------------------------------------------------------------------- */
@@ -623,10 +645,10 @@ export function AlmanacDeckWidget() {
       <CardContent className="flex h-full flex-col py-4">
         <div className="mb-1.5 flex items-center gap-2">
           <Activity
-            className="h-3.5 w-3.5 text-[color:var(--accent-1)]"
+            className="h-4 w-4 text-[color:var(--accent-1)]"
             strokeWidth={1.75}
           />
-          <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-foreground/60">
+          <p className="text-[12px] font-medium uppercase tracking-[0.28em] text-foreground/60">
             {card.label}
           </p>
         </div>
@@ -637,17 +659,6 @@ export function AlmanacDeckWidget() {
           aria-live="polite"
         >
           {card.node}
-        </div>
-
-        <div className="flex items-center gap-1 pt-1.5">
-          {cards.map((c, j) => (
-            <span
-              key={c.label}
-              className="h-1 w-1 rounded-full"
-              style={{ background: j === i ? "var(--accent-1)" : "var(--rule)" }}
-              aria-hidden
-            />
-          ))}
         </div>
       </CardContent>
     </Card>

@@ -44,8 +44,9 @@ export interface SeasonInfo {
   emoji: string;
 }
 
-export interface NextSeasonInfo {
-  next: Season;
+export interface UpcomingSeason {
+  season: Season;
+  emoji: string;
   days: number;
 }
 
@@ -61,7 +62,7 @@ export const SEASON_STARTS: ReadonlyArray<{
 }> = [
   { month: 3, season: "Autumn", emoji: "🍂" },
   { month: 6, season: "Winter", emoji: "❄️" },
-  { month: 9, season: "Spring", emoji: "🌸" },
+  { month: 9, season: "Spring", emoji: "🌷" },
   { month: 12, season: "Summer", emoji: "☀️" },
 ];
 
@@ -79,19 +80,20 @@ export function currentSeason(today: Date): SeasonInfo {
 }
 
 /**
- * The next season to begin, and how many calendar days until its start. Each
- * season's start date is built for this year; any start that is today-or-past
- * rolls to next year, then we take the soonest. A season starting *today* is
- * treated as already begun, so the result is always strictly in the future.
+ * All four upcoming season starts, soonest first. Each season's start date is
+ * built for this year; any start that is today-or-past rolls to next year, so
+ * every entry is strictly in the future (a season starting *today* is treated
+ * as already begun). Entry 0 is the next season to arrive; the rest complete
+ * the year's cycle in order.
  */
-export function daysUntilNextSeason(today: Date): NextSeasonInfo {
-  const upcoming = SEASON_STARTS.map(({ month, season }) => {
+export function upcomingSeasons(today: Date): UpcomingSeason[] {
+  const upcoming = SEASON_STARTS.map(({ month, season, emoji }) => {
     const start = new Date(today.getFullYear(), month - 1, 1);
     if (differenceInCalendarDays(start, today) <= 0) {
       start.setFullYear(start.getFullYear() + 1);
     }
-    return { next: season, days: daysUntil(start, today) };
+    return { season, emoji, days: daysUntil(start, today) };
   });
   upcoming.sort((a, b) => a.days - b.days);
-  return upcoming[0];
+  return upcoming;
 }
