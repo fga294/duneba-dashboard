@@ -94,12 +94,10 @@ async function geocode(lat: number, lon: number, key: string): Promise<string | 
     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`;
     const res = await fetch(url, {
       headers: { "User-Agent": "duneba-dashboard (personal use)" },
-      signal: AbortSignal.timeout(3000),
+      // Cold requests from the kiosk's network were observed at ~5s.
+      signal: AbortSignal.timeout(8000),
     });
-    if (!res.ok) {
-      geoCache.set(key, null);
-      return null;
-    }
+    if (!res.ok) return null;
     const data = (await res.json()) as NominatimResponse;
     const addr = data.address ?? {};
     const place =
@@ -109,8 +107,8 @@ async function geocode(lat: number, lon: number, key: string): Promise<string | 
     geoCache.set(key, formatted);
     return formatted;
   } catch (err) {
+    // Failures are deliberately not cached — a later request retries.
     console.error("Geocode failed:", err);
-    geoCache.set(key, null);
     return null;
   }
 }
@@ -128,8 +126,13 @@ export async function getPhotoMeta(absPath: string): Promise<PhotoMeta> {
         xmp: true,
         iptc: true,
       })) as ExifResult | null;
-    } catch {
-      // File has no EXIF, or parser failed — both fine, we have fallbacks.
+    } catch (err) {
+      // Fallbacks cover missing EXIF, but log it — a broken parser must not
+      // be indistinguishable from "file has no metadata".
+      console.warn(
+        `EXIF parse failed for ${absPath}:`,
+        err instanceof Error ? err.message : err
+      );
     }
     const date = extractDate(exif, absPath, stat.mtimeMs);
     raw = {
