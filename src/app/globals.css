@@ -196,6 +196,19 @@
     background: oklch(0.3 0.006 250);
   }
 
+  /* Calendar day-cell vertical marquee. The strip holds two identical copies
+     of the day's events, so translating to -50% lands copy B exactly where
+     copy A began — the loop restart is invisible. Transform-only, so the
+     always-on kiosk animates on the compositor, not the CPU. */
+  .cal-marquee {
+    animation: cal-marquee var(--cal-marquee-duration, 32s) linear infinite;
+    will-change: transform;
+  }
+  @keyframes cal-marquee {
+    0%, 8% { transform: translateY(0); } /* brief hold each loop so the top reads */
+    100% { transform: translateY(-50%); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .glass-hover { transition: none; }
     *, *::before, *::after { animation: none !important; transition: none !important; }

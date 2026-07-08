@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,6 +46,108 @@ function eventSurface(colorId: string) {
     background: `linear-gradient(135deg, color-mix(in oklch, ${color} 26%, oklch(0.24 0.005 250)) 0%, color-mix(in oklch, ${color} 12%, oklch(0.24 0.005 250)) 100%)`,
     boxShadow: `inset 4px 0 0 0 ${color}, inset 0 0 0 1px color-mix(in oklch, ${color} 30%, transparent)`,
   };
+}
+
+// One tile for both kinds of event; all-day tiles differ only in their time row.
+function EventTile({ event }: { event: CalendarEvent }) {
+  const start = parseISO(event.start);
+  const end = parseISO(event.end);
+  const timeLabel = event.allDay
+    ? "All day"
+    : `${format(start, "h:mm a")} – ${format(end, "h:mm a")}`;
+  return (
+    <div
+      className="relative flex min-h-[96px] flex-col justify-center overflow-hidden rounded-lg px-3 py-4"
+      style={eventSurface(event.color)}
+      title={`${event.summary} · ${timeLabel}`}
+    >
+      <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-foreground">
+        {event.summary}
+      </div>
+      {event.location && (
+        <div className="mt-1 flex items-center gap-1 pl-1.5 text-foreground/65">
+          <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+          <span className="truncate text-[11px]" title={event.location}>
+            {event.location}
+          </span>
+        </div>
+      )}
+      {event.allDay ? (
+        <div className="mt-1.5 pl-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-foreground/60">
+          {timeLabel}
+        </div>
+      ) : (
+        <div className="mt-1.5 pl-1.5 truncate font-mono text-[11px] text-foreground/65 num-tabular">
+          {timeLabel}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Marquee tuning. Threshold counts real events (the cell fits ~3 tiles);
+// duration scales per event so scroll speed stays constant regardless of list
+// length; negative per-column delays desync cells that overflow in the same
+// week so the grid never rolls in lockstep.
+const MARQUEE_MIN_EVENTS = 4;
+const MARQUEE_SECONDS_PER_EVENT = 7;
+const MARQUEE_STAGGER_SECONDS = 11;
+
+// A day cell. Events render chronologically: all-day first, then timed.
+// Days with more events than fit roll through them as a slow vertical
+// marquee; the rest stay static.
+function DayColumn({
+  dayIndex,
+  timed,
+  allDay,
+}: {
+  dayIndex: number;
+  timed: CalendarEvent[];
+  allDay: CalendarEvent[];
+}) {
+  const sequence = [...allDay, ...timed];
+  const marquee = sequence.length >= MARQUEE_MIN_EVENTS;
+
+  return (
+    <div className="flex flex-col gap-2 overflow-hidden rounded-lg bg-white/[0.02] p-2 ring-1 ring-white/[0.05]">
+      {marquee ? (
+        <div className="relative min-h-0 flex-1 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_12px,black_calc(100%_-_12px),transparent)]">
+          <div
+            className="cal-marquee flex flex-col"
+            style={
+              {
+                "--cal-marquee-duration": `${sequence.length * MARQUEE_SECONDS_PER_EVENT}s`,
+                animationDelay: `${-dayIndex * MARQUEE_STAGGER_SECONDS}s`,
+              } as CSSProperties
+            }
+          >
+            {[0, 1].map((copy) => (
+              <div
+                key={copy}
+                aria-hidden={copy === 1}
+                className="flex flex-col gap-2 pb-2"
+              >
+                {sequence.map((event) => (
+                  <EventTile key={`${copy}-${event.id}`} event={event} />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <>
+          {sequence.map((event) => (
+            <EventTile key={event.id} event={event} />
+          ))}
+          {sequence.length === 0 && (
+            <div className="flex flex-1 items-center justify-center text-[10px] text-foreground/35">
+              —
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
 }
 
 function dayHeader(date: Date): { label: string; sub: string; isToday: boolean } {
@@ -146,73 +249,13 @@ export function CalendarWidget() {
 
         {/* Day columns: events stacked top-down, earliest first */}
         <div className="grid flex-1 grid-cols-5 gap-1.5">
-          {eventsByDay.map(({ day, timed, allDay }) => (
-            <div
+          {eventsByDay.map(({ day, timed, allDay }, i) => (
+            <DayColumn
               key={day.toISOString()}
-              className="flex flex-col gap-2 overflow-hidden rounded-lg bg-white/[0.02] p-2 ring-1 ring-white/[0.05]"
-            >
-              {allDay.map((event) => {
-                return (
-                  <div
-                    key={event.id}
-                    className="relative flex min-h-[96px] flex-col justify-center overflow-hidden rounded-lg px-3 py-4"
-                    style={eventSurface(event.color)}
-                    title={`${event.summary} · All day`}
-                  >
-                    <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-foreground">
-                      {event.summary}
-                    </div>
-                    {event.location && (
-                      <div className="mt-1 flex items-center gap-1 pl-1.5 text-foreground/65">
-                        <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-                        <span className="truncate text-[11px]" title={event.location}>
-                          {event.location}
-                        </span>
-                      </div>
-                    )}
-                    <div className="mt-1.5 pl-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-foreground/60">
-                      All day
-                    </div>
-                  </div>
-                );
-              })}
-
-              {timed.map((event) => {
-                const start = parseISO(event.start);
-                const end = parseISO(event.end);
-                return (
-                  <div
-                    key={event.id}
-                    className="relative overflow-hidden rounded-lg"
-                    style={eventSurface(event.color)}
-                    title={`${event.summary} · ${format(start, "h:mm a")} – ${format(end, "h:mm a")}`}
-                  >
-                    <div className="flex min-h-[96px] flex-col justify-center px-3 py-4">
-                      <div className="line-clamp-3 pl-1.5 text-[15px] font-semibold leading-snug text-foreground">
-                        {event.summary}
-                      </div>
-                      {event.location && (
-                        <div className="mt-1 flex items-center gap-1 pl-1.5 text-foreground/65">
-                          <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-                          <span className="truncate text-[11px]" title={event.location}>
-                            {event.location}
-                          </span>
-                        </div>
-                      )}
-                      <div className="mt-1.5 pl-1.5 truncate font-mono text-[11px] text-foreground/65 num-tabular">
-                        {format(start, "h:mm a")} – {format(end, "h:mm a")}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {timed.length === 0 && allDay.length === 0 && (
-                <div className="flex flex-1 items-center justify-center text-[10px] text-foreground/35">
-                  —
-                </div>
-              )}
-            </div>
+              dayIndex={i}
+              timed={timed}
+              allDay={allDay}
+            />
           ))}
         </div>
       </CardContent>
