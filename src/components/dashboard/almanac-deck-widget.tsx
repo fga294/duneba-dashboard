@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  Fragment,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import useSWR from "swr";
 import { startOfDay } from "date-fns";
 import ReactCountryFlag from "react-country-flag";
@@ -173,29 +179,87 @@ function MonthTick({ label }: { label: string }) {
   );
 }
 
-function Flag({ code }: { code: string }) {
+// `large` is the marquee size (Time on Earth); default stays the coin size the
+// FX rate rows use.
+function Flag({ code, large }: { code: string; large?: boolean }) {
   return (
-    <span className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.15]">
+    <span
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.15] ${
+        large ? "h-14 w-14" : "h-5 w-5"
+      }`}
+    >
       <ReactCountryFlag
         countryCode={code}
         svg
-        style={{ width: "1.5em", height: "1.5em" }}
+        style={
+          large
+            ? { width: "4.5em", height: "4.5em" }
+            : { width: "1.5em", height: "1.5em" }
+        }
         aria-label={code}
       />
     </span>
   );
 }
 
-// Coin-sized face avatar — same diameter and ring as Flag so the people rows
-// and the Living-in-Australia row stay perfectly aligned. alt is empty because
-// the person's name sits right beside the photo.
+// Round face avatar for the Time on Earth marquee — same ring treatment as
+// Flag. alt is empty because the person's name sits right beside the photo.
 function Face({ src }: { src: string }) {
   return (
-    <span className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.15]">
+    <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.15]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" className="h-full w-full object-cover" />
     </span>
   );
+}
+
+/* --- horizontal marquee primitives ------------------------------------------- */
+
+// Two identical copies of the children glide left on the compositor
+// (transform-only, see .deck-marquee); translating -50% lands copy B exactly
+// where copy A began, so the loop restart is invisible. Each item must carry
+// its own trailing divider so the seam between copies matches every other gap.
+// Duration scales with item count to keep the px/s pace steady across cards.
+// The w-max track is thousands of px wide, so it must be absolutely positioned
+// (out of flow) — in normal flow its intrinsic width propagates into the page
+// grid and blows the whole layout out to the track's width.
+function DeckMarquee({
+  itemCount,
+  secondsPerItem,
+  children,
+}: {
+  itemCount: number;
+  secondsPerItem: number;
+  children: ReactNode;
+}) {
+  return (
+    <div className="relative h-16 w-full">
+      <div className="absolute inset-0 flex items-center overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_28px,black_calc(100%_-_28px),transparent)]">
+        <div
+          className="deck-marquee flex w-max"
+          style={
+            {
+              "--deck-marquee-duration": `${itemCount * secondsPerItem}s`,
+            } as CSSProperties
+          }
+        >
+          {[0, 1].map((copy) => (
+            <div
+              key={copy}
+              aria-hidden={copy === 1}
+              className="flex items-center"
+            >
+              {children}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MarqueeDivider() {
+  return <span className="mx-8 h-10 w-px shrink-0 bg-white/[0.12]" aria-hidden />;
 }
 
 function Row({
@@ -406,49 +470,44 @@ function MoonBody({ astronomy }: { astronomy?: WeatherData["astronomy"] }) {
   );
 }
 
-// All ten bodies in a three-column grid of two-column rows: [☉ Sun]  [22° Cancer].
-// The right group is nowrap so "22° Sagittarius" never breaks; an ember ℞
-// between degree and sign marks bodies currently in retrograde motion.
-// items-center (not baseline): the oversized glyphs would ride high otherwise.
+// All ten bodies as one right-to-left marquee: ☉ Sun 22° Cancer | ☽ Moon 4° Leo …
+// The marquee frees the room to make the glyphs the hero; an ember ℞ between
+// degree and sign marks bodies currently in retrograde motion.
 function TransitsBody({ transits }: { transits?: TransitBody[] }) {
   if (!transits) return <Pending />;
   return (
-    <div className="grid max-w-[860px] grid-cols-3 gap-x-8">
+    <DeckMarquee itemCount={transits.length} secondsPerItem={5}>
       {transits.map((t) => (
-        <div
-          key={t.name}
-          className="flex items-center justify-between gap-2 py-0.5"
-        >
-          <span className="flex min-w-0 items-center gap-2">
+        <Fragment key={t.name}>
+          <span className="flex shrink-0 items-center gap-3 whitespace-nowrap">
             <span
-              className="w-6 shrink-0 text-center text-[23px] leading-none text-foreground/70"
+              className="text-[42px] leading-none text-foreground/70"
               aria-hidden
             >
               {t.symbol}
             </span>
-            <span className="truncate text-[14px] font-medium text-foreground/85">
+            <span className="text-[19px] font-medium text-foreground/85">
               {t.name}
             </span>
-          </span>
-          <span className="flex shrink-0 items-baseline gap-1.5 whitespace-nowrap">
-            <span className="font-mono text-[13px] text-foreground/50 num-tabular">
+            <span className="font-mono text-[17px] text-foreground/50 num-tabular">
               {t.degree}°
             </span>
             {t.retrograde && (
               <span
-                className="text-[12px] text-[color:var(--accent-1)]"
+                className="text-[15px] text-[color:var(--accent-1)]"
                 title="Retrograde"
               >
                 ℞
               </span>
             )}
-            <span className="text-[14px] font-medium text-[color:var(--accent-2)]">
+            <span className="text-[19px] font-medium text-[color:var(--accent-2)]">
               {t.sign}
             </span>
           </span>
-        </div>
+          <MarqueeDivider />
+        </Fragment>
       ))}
-    </div>
+    </DeckMarquee>
   );
 }
 
@@ -489,25 +548,45 @@ function FxBody({ currency }: { currency?: CurrencyRates }) {
   );
 }
 
+// People (and the Australia anniversary, treated as a fifth equal item) as one
+// right-to-left marquee of large round avatars with a stacked name/days block.
 function TimeBody({ today }: { today: Date }) {
+  const items = [
+    ...PEOPLE.map((p) => ({
+      key: p.name,
+      avatar: <Face src={p.photo} />,
+      label: p.name,
+      days: daysSince(p.dob, today),
+    })),
+    {
+      key: "australia",
+      avatar: <Flag code="AU" large />,
+      label: "Living in Australia",
+      days: daysSince(ARRIVAL_AU, today),
+    },
+  ];
   return (
-    <div className="grid max-w-[680px] grid-cols-2 gap-x-10">
-      {PEOPLE.map((p) => (
-        <Row
-          key={p.name}
-          icon={<Face src={p.photo} />}
-          label={p.name}
-          value={daysSince(p.dob, today).toLocaleString()}
-          unit="days"
-        />
+    <DeckMarquee itemCount={items.length} secondsPerItem={6}>
+      {items.map((it) => (
+        <Fragment key={it.key}>
+          <span className="flex shrink-0 items-center gap-3.5 whitespace-nowrap">
+            {it.avatar}
+            <span className="flex flex-col gap-0.5">
+              <span className="text-[16px] font-medium leading-none text-foreground/85">
+                {it.label}
+              </span>
+              <span className="font-mono text-[21px] font-medium leading-none text-[color:var(--accent-1)] num-tabular">
+                {it.days.toLocaleString()}
+                <span className="ml-1.5 font-sans text-[13px] font-normal text-foreground/50">
+                  days
+                </span>
+              </span>
+            </span>
+          </span>
+          <MarqueeDivider />
+        </Fragment>
       ))}
-      <Row
-        icon={<Flag code="AU" />}
-        label="Living in Australia"
-        value={daysSince(ARRIVAL_AU, today).toLocaleString()}
-        unit="days"
-      />
-    </div>
+    </DeckMarquee>
   );
 }
 
