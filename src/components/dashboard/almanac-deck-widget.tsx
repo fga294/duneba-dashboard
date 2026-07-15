@@ -29,15 +29,16 @@ import {
 import type {
   CurrencyRates,
   QuoteData,
+  TransitBody,
   WeatherCurrent,
   WeatherData,
 } from "@/types/dashboard";
 
 /* ---------------------------------------------------------------------------
  * The Almanac Deck — one card slot that rotates through the almanac facts
- * every 30 s: Moon Phases · Exchange Rates · Time on Earth · Countdowns ·
- * Season · Weather Gauges · Quote. Fixed height so the layout never jumps
- * between cards.
+ * every 30 s: Moon Phases · Astrological Transits · Exchange Rates ·
+ * Time on Earth · Countdowns · Season · Weather Gauges · Quote. Fixed height
+ * so the layout never jumps between cards.
  * ------------------------------------------------------------------------- */
 
 const CYCLE_MS = 30_000;
@@ -51,11 +52,12 @@ const fetcher = (url: string) =>
 /* --- shared personal data (formerly Data Tracker) ---------------------------- */
 
 // Local-midnight constructors (month is 0-indexed in the Date ctor).
+// Photo paths are case-sensitive on the Linux kiosk — keep the exact casing.
 const PEOPLE = [
-  { emoji: "🧑", name: "Fabricio", dob: new Date(1982, 3, 29) },
-  { emoji: "👩", name: "Viviane", dob: new Date(1981, 3, 22) },
-  { emoji: "👦", name: "Dimitri", dob: new Date(2012, 0, 2) },
-  { emoji: "🐶", name: "Lola", dob: new Date(2020, 8, 22) },
+  { photo: "/Fabricio_face.PNG", name: "Fabricio", dob: new Date(1982, 3, 29) },
+  { photo: "/Viviane_face.JPG", name: "Viviane", dob: new Date(1981, 3, 22) },
+  { photo: "/Dimitri_face.PNG", name: "Dimitri", dob: new Date(2012, 0, 2) },
+  { photo: "/Lola_face.JPG", name: "Lola", dob: new Date(2020, 8, 22) },
 ] as const;
 
 const ARRIVAL_AU = new Date(2015, 0, 23);
@@ -180,6 +182,18 @@ function Flag({ code }: { code: string }) {
         style={{ width: "1.5em", height: "1.5em" }}
         aria-label={code}
       />
+    </span>
+  );
+}
+
+// Coin-sized face avatar — same diameter and ring as Flag so the people rows
+// and the Living-in-Australia row stay perfectly aligned. alt is empty because
+// the person's name sits right beside the photo.
+function Face({ src }: { src: string }) {
+  return (
+    <span className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/[0.15]">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" className="h-full w-full object-cover" />
     </span>
   );
 }
@@ -392,6 +406,52 @@ function MoonBody({ astronomy }: { astronomy?: WeatherData["astronomy"] }) {
   );
 }
 
+// All ten bodies in a three-column grid of two-column rows: [☉ Sun]  [22° Cancer].
+// The right group is nowrap so "22° Sagittarius" never breaks; an ember ℞
+// between degree and sign marks bodies currently in retrograde motion.
+// items-center (not baseline): the oversized glyphs would ride high otherwise.
+function TransitsBody({ transits }: { transits?: TransitBody[] }) {
+  if (!transits) return <Pending />;
+  return (
+    <div className="grid max-w-[860px] grid-cols-3 gap-x-8">
+      {transits.map((t) => (
+        <div
+          key={t.name}
+          className="flex items-center justify-between gap-2 py-0.5"
+        >
+          <span className="flex min-w-0 items-center gap-2">
+            <span
+              className="w-6 shrink-0 text-center text-[23px] leading-none text-foreground/70"
+              aria-hidden
+            >
+              {t.symbol}
+            </span>
+            <span className="truncate text-[14px] font-medium text-foreground/85">
+              {t.name}
+            </span>
+          </span>
+          <span className="flex shrink-0 items-baseline gap-1.5 whitespace-nowrap">
+            <span className="font-mono text-[13px] text-foreground/50 num-tabular">
+              {t.degree}°
+            </span>
+            {t.retrograde && (
+              <span
+                className="text-[12px] text-[color:var(--accent-1)]"
+                title="Retrograde"
+              >
+                ℞
+              </span>
+            )}
+            <span className="text-[14px] font-medium text-[color:var(--accent-2)]">
+              {t.sign}
+            </span>
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function FxBody({ currency }: { currency?: CurrencyRates }) {
   if (!currency) return <Pending />;
   const histDates = currency.historyDates ?? [];
@@ -435,7 +495,7 @@ function TimeBody({ today }: { today: Date }) {
       {PEOPLE.map((p) => (
         <Row
           key={p.name}
-          icon={p.emoji}
+          icon={<Face src={p.photo} />}
           label={p.name}
           value={daysSince(p.dob, today).toLocaleString()}
           unit="days"
@@ -624,11 +684,20 @@ export function AlmanacDeckWidget() {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
+  // Computed locally by the ephemeris package — refreshing every 10 min keeps
+  // the fast-moving Moon (~0.5°/hour) accurate at zero external cost.
+  const { data: transits } = useSWR<TransitBody[]>("/api/transits", fetcher, {
+    refreshInterval: 10 * 60 * 1000,
+  });
 
   if (!today) return null;
 
   const cards: { label: string; node: ReactNode }[] = [
     { label: "Moon Phases", node: <MoonBody astronomy={weather?.astronomy} /> },
+    {
+      label: "Astrological Transits",
+      node: <TransitsBody transits={transits} />,
+    },
     { label: "Exchange Rates", node: <FxBody currency={currency} /> },
     { label: "Time on Earth", node: <TimeBody today={today} /> },
     { label: "Countdowns", node: <CountdownBody today={today} /> },
