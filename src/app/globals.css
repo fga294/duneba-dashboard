@@ -209,15 +209,20 @@
     100% { transform: translateY(-50%); }
   }
 
-  /* Almanac deck horizontal marquee — same two-copy -50% technique as
-     .cal-marquee, on the X axis. No hold: a ticker should glide, not stutter. */
-  .deck-marquee {
-    animation: deck-marquee var(--deck-marquee-duration, 40s) linear infinite;
-    will-change: transform;
+  /* Time on Earth two-state crossfade: two stacked layers share one 20 s
+     opacity cycle, the second layer delayed by half a cycle (inline
+     animation-delay) so each state holds ~10 s. Opacity-only, so the
+     always-on kiosk stays on the compositor. fill-mode backwards keeps the
+     delayed layer hidden while it waits for its first cycle. */
+  .deck-fade {
+    animation: deck-fade 20s linear infinite backwards;
   }
-  @keyframes deck-marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+  @keyframes deck-fade {
+    0% { opacity: 0; }
+    4% { opacity: 1; }
+    46% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {

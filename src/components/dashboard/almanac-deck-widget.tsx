@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Fragment,
-  useEffect,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import useSWR from "swr";
 import { startOfDay } from "date-fns";
 import ReactCountryFlag from "react-country-flag";
@@ -14,6 +8,7 @@ import {
   Activity,
   Droplets,
   Eye,
+  House,
   Leaf,
   Quote,
   Sun,
@@ -67,6 +62,8 @@ const PEOPLE = [
 ] as const;
 
 const ARRIVAL_AU = new Date(2015, 0, 23);
+// 3 July 2020 — day 3 of month 7 (DD/MM; the Date ctor month is 0-indexed).
+const DUNEBA_SINCE = new Date(2020, 6, 3);
 
 // `month` here is human form (1-12) to match `nextAnniversary`.
 const COUNTDOWNS = [
@@ -213,83 +210,31 @@ function Face({ src }: { src: string }) {
   );
 }
 
-/* --- horizontal marquee primitives ------------------------------------------- */
-
-// Two identical copies of the children glide left on the compositor
-// (transform-only, see .deck-marquee); translating -50% lands copy B exactly
-// where copy A began, so the loop restart is invisible. Each item must carry
-// its own trailing divider so the seam between copies matches every other gap.
-// Duration scales with item count to keep the px/s pace steady across cards.
-// The w-max track is thousands of px wide, so it must be absolutely positioned
-// (out of flow) — in normal flow its intrinsic width propagates into the page
-// grid and blows the whole layout out to the track's width.
-function DeckMarquee({
-  itemCount,
-  secondsPerItem,
-  children,
-}: {
-  itemCount: number;
-  secondsPerItem: number;
-  children: ReactNode;
-}) {
-  return (
-    <div className="relative h-16 w-full">
-      <div className="absolute inset-0 flex items-center overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_28px,black_calc(100%_-_28px),transparent)]">
-        <div
-          className="deck-marquee flex w-max"
-          style={
-            {
-              "--deck-marquee-duration": `${itemCount * secondsPerItem}s`,
-            } as CSSProperties
-          }
-        >
-          {[0, 1].map((copy) => (
-            <div
-              key={copy}
-              aria-hidden={copy === 1}
-              className="flex items-center"
-            >
-              {children}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MarqueeDivider() {
-  return <span className="mx-8 h-10 w-px shrink-0 bg-white/[0.12]" aria-hidden />;
-}
-
-function Row({
-  icon,
+// A person/anniversary chip: round avatar beside a stacked name / day-count.
+function TimePerson({
+  avatar,
   label,
-  value,
-  unit,
+  days,
 }: {
-  icon: ReactNode;
+  avatar: ReactNode;
   label: string;
-  value: string;
-  unit?: string;
+  days: number;
 }) {
   return (
-    <div className="flex items-center justify-between gap-2 py-0.5">
-      <span className="flex min-w-0 items-center gap-1.5">
-        <span className="text-[18px] leading-none">{icon}</span>
-        <span className="truncate text-[15px] font-medium text-foreground/85">
+    <span className="flex shrink-0 items-center gap-3.5 whitespace-nowrap">
+      {avatar}
+      <span className="flex flex-col gap-0.5">
+        <span className="text-[16px] font-medium leading-none text-foreground/85">
           {label}
         </span>
-      </span>
-      <span className="shrink-0 font-mono text-[16px] font-medium text-[color:var(--accent-1)] num-tabular">
-        {value}
-        {unit && (
-          <span className="ml-1 text-[12px] font-normal text-foreground/50">
-            {unit}
+        <span className="font-mono text-[21px] font-medium leading-none text-[color:var(--accent-1)] num-tabular">
+          {days.toLocaleString()}
+          <span className="ml-1.5 font-sans text-[13px] font-normal text-foreground/50">
+            days
           </span>
-        )}
+        </span>
       </span>
-    </div>
+    </span>
   );
 }
 
@@ -310,7 +255,9 @@ function RateRow({
 }) {
   const up = history.length >= 2 && history[history.length - 1] >= history[0];
   return (
-    <div className="flex items-center justify-between gap-2 py-0.5">
+    // Left-aligned, compact: the three groups (flag, sparkline, price) sit
+    // together instead of spreading across the card.
+    <div className="flex items-center gap-4 py-0.5">
       <span className="flex min-w-0 items-center gap-1.5">
         <span className="text-[18px] leading-none">
           <Flag code={countryCode} />
@@ -470,44 +417,46 @@ function MoonBody({ astronomy }: { astronomy?: WeatherData["astronomy"] }) {
   );
 }
 
-// All ten bodies as one right-to-left marquee: ☉ Sun 22° Cancer | ☽ Moon 4° Leo …
-// The marquee frees the room to make the glyphs the hero; an ember ℞ between
+// All ten bodies statically fill the card as a 5×2 grid. Each cell pairs a
+// large glyph with a two-line name / degree-sign stack — the tallest, widest
+// type the fixed card height allows without scrolling. An ember ℞ between
 // degree and sign marks bodies currently in retrograde motion.
 function TransitsBody({ transits }: { transits?: TransitBody[] }) {
   if (!transits) return <Pending />;
   return (
-    <DeckMarquee itemCount={transits.length} secondsPerItem={5}>
+    <div className="grid grid-cols-5 gap-x-6 gap-y-5">
       {transits.map((t) => (
-        <Fragment key={t.name}>
-          <span className="flex shrink-0 items-center gap-3 whitespace-nowrap">
-            <span
-              className="text-[42px] leading-none text-foreground/70"
-              aria-hidden
-            >
-              {t.symbol}
-            </span>
-            <span className="text-[19px] font-medium text-foreground/85">
+        <div key={t.name} className="flex items-center gap-3">
+          <span
+            className="w-8 shrink-0 text-center text-[32px] leading-none text-foreground/70"
+            aria-hidden
+          >
+            {t.symbol}
+          </span>
+          <span className="flex flex-col gap-1">
+            <span className="text-[16px] font-medium leading-none text-foreground/85">
               {t.name}
             </span>
-            <span className="font-mono text-[17px] text-foreground/50 num-tabular">
-              {t.degree}°
-            </span>
-            {t.retrograde && (
-              <span
-                className="text-[15px] text-[color:var(--accent-1)]"
-                title="Retrograde"
-              >
-                ℞
+            <span className="flex items-baseline gap-1.5 whitespace-nowrap leading-none">
+              <span className="font-mono text-[14px] text-foreground/50 num-tabular">
+                {t.degree}°
               </span>
-            )}
-            <span className="text-[19px] font-medium text-[color:var(--accent-2)]">
-              {t.sign}
+              {t.retrograde && (
+                <span
+                  className="text-[13px] text-[color:var(--accent-1)]"
+                  title="Retrograde"
+                >
+                  ℞
+                </span>
+              )}
+              <span className="text-[15px] font-medium text-[color:var(--accent-2)]">
+                {t.sign}
+              </span>
             </span>
           </span>
-          <MarqueeDivider />
-        </Fragment>
+        </div>
       ))}
-    </DeckMarquee>
+    </div>
   );
 }
 
@@ -548,61 +497,136 @@ function FxBody({ currency }: { currency?: CurrencyRates }) {
   );
 }
 
-// People (and the Australia anniversary, treated as a fifth equal item) as one
-// right-to-left marquee of large round avatars with a stacked name/days block.
+// Two states crossfading on a 20 s cycle (~10 s each, see .deck-fade): the
+// four people, then the household anniversaries — Living in Australia and the
+// Duneba house counter. Layers are absolutely stacked (out of flow) so their
+// intrinsic width can never propagate into the page grid; the delayed layer
+// also carries base opacity-0 so a reduced-motion freeze shows only state A.
 function TimeBody({ today }: { today: Date }) {
-  const items = [
-    ...PEOPLE.map((p) => ({
-      key: p.name,
-      avatar: <Face src={p.photo} />,
-      label: p.name,
-      days: daysSince(p.dob, today),
-    })),
-    {
-      key: "australia",
-      avatar: <Flag code="AU" large />,
-      label: "Living in Australia",
-      days: daysSince(ARRIVAL_AU, today),
-    },
-  ];
   return (
-    <DeckMarquee itemCount={items.length} secondsPerItem={6}>
-      {items.map((it) => (
-        <Fragment key={it.key}>
-          <span className="flex shrink-0 items-center gap-3.5 whitespace-nowrap">
-            {it.avatar}
-            <span className="flex flex-col gap-0.5">
-              <span className="text-[16px] font-medium leading-none text-foreground/85">
-                {it.label}
-              </span>
-              <span className="font-mono text-[21px] font-medium leading-none text-[color:var(--accent-1)] num-tabular">
-                {it.days.toLocaleString()}
-                <span className="ml-1.5 font-sans text-[13px] font-normal text-foreground/50">
-                  days
-                </span>
-              </span>
+    <div className="relative h-16 w-full overflow-hidden">
+      <div className="deck-fade absolute inset-0 flex items-center gap-12">
+        {PEOPLE.map((p) => (
+          <TimePerson
+            key={p.name}
+            avatar={<Face src={p.photo} />}
+            label={p.name}
+            days={daysSince(p.dob, today)}
+          />
+        ))}
+      </div>
+      <div
+        className="deck-fade absolute inset-0 flex items-center gap-16 opacity-0"
+        style={{ animationDelay: "10s" }}
+      >
+        <TimePerson
+          avatar={<Flag code="AU" large />}
+          label="Living in Australia"
+          days={daysSince(ARRIVAL_AU, today)}
+        />
+        <TimePerson
+          avatar={
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/[0.04] ring-1 ring-white/[0.15]">
+              <House
+                className="h-7 w-7 text-[color:var(--accent-1)]"
+                strokeWidth={1.5}
+              />
             </span>
-          </span>
-          <MarqueeDivider />
-        </Fragment>
-      ))}
-    </DeckMarquee>
+          }
+          label="Duneba"
+          days={daysSince(DUNEBA_SINCE, today)}
+        />
+      </div>
+    </div>
   );
 }
 
+// The year as a line, today as a fixed ember dial at its centre. Anniversaries
+// and season starts enter from the right ("in N days"), drift toward the dial
+// as days pass, light up ember on the day itself, then recede left ("N days
+// ago") until they fall off the edge half a year later. Emoji sit ON the line
+// like beads on a rail (clear of the card's vertical clip); their text stacks
+// alternate above/below in x-order so near-coincident dates never collide.
 function CountdownBody({ today }: { today: Date }) {
+  const events = [
+    ...COUNTDOWNS.map((c) => ({
+      emoji: c.emoji,
+      label: c.label,
+      days: daysUntil(nextAnniversary(c.month, c.day, today), today),
+    })),
+    // Season starts from the same helper the Season card uses. A season
+    // starting today reports 365 days, which folds to offset 0 — "Today".
+    ...upcomingSeasons(today).map((s) => ({
+      emoji: s.emoji,
+      label: s.season,
+      days: s.days,
+    })),
+  ]
+    // Fold the yearly cycle onto ±half a year around today: an anniversary
+    // more than ~6 months out reads as the previous one receding into the past.
+    .map((e) => ({ ...e, offset: e.days <= 182 ? e.days : e.days - 365 }))
+    .sort((a, b) => a.offset - b.offset);
+
   return (
-    <div className="grid max-w-[680px] grid-cols-2 gap-x-10">
-      {COUNTDOWNS.map((c) => {
-        const d = daysUntil(nextAnniversary(c.month, c.day, today), today);
+    <div className="relative h-[124px] w-full overflow-hidden">
+      <div
+        className="absolute inset-x-0 top-1/2 h-px bg-white/[0.12] [mask-image:linear-gradient(to_right,transparent,black_24px,black_calc(100%_-_24px),transparent)]"
+        aria-hidden
+      />
+      {/* fixed centre dial — the "now" reference the markers drift through */}
+      <span
+        className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[2px] bg-[color:var(--accent-1)]"
+        aria-hidden
+      />
+      {events.map((e, i) => {
+        const isToday = e.offset === 0;
+        const past = e.offset < 0;
+        const above = i % 2 === 0;
+        const pct = 50 + (e.offset / 365) * 100;
+        const caption = isToday
+          ? "Today"
+          : past
+            ? `${-e.offset} days ago`
+            : `in ${e.offset} days`;
         return (
-          <Row
-            key={c.label}
-            icon={c.emoji}
-            label={c.label}
-            value={d === 0 ? "Today" : d.toLocaleString()}
-            unit={d === 0 ? undefined : "days away"}
-          />
+          <Fragment key={e.label}>
+            {/* the bead riding the rail */}
+            <span
+              className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 leading-none ${
+                isToday ? "text-[26px]" : "text-[20px]"
+              } ${past ? "opacity-60" : ""}`}
+              style={{ left: `${pct}%` }}
+              aria-hidden
+            >
+              {e.emoji}
+            </span>
+            {/* its label, floated clear of the rail */}
+            <div
+              className={`absolute flex -translate-x-1/2 flex-col items-center gap-1 whitespace-nowrap ${
+                above ? "bottom-1/2 mb-4" : "top-1/2 mt-4"
+              } ${past ? "opacity-60" : ""}`}
+              style={{ left: `${pct}%` }}
+            >
+              <span
+                className={`text-[12px] font-medium leading-none ${
+                  isToday ? "text-foreground" : "text-foreground/75"
+                }`}
+              >
+                {e.label}
+              </span>
+              <span
+                className={`font-mono text-[11px] leading-none num-tabular ${
+                  isToday
+                    ? "font-semibold text-[color:var(--accent-1)]"
+                    : past
+                      ? "text-foreground/45"
+                      : "text-[color:var(--accent-1)]"
+                }`}
+              >
+                {caption}
+              </span>
+            </div>
+          </Fragment>
         );
       })}
     </div>
