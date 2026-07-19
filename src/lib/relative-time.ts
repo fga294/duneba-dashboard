@@ -39,11 +39,6 @@ export function nextAnniversary(month: number, day: number, today: Date): Date {
 
 export type Season = "Summer" | "Autumn" | "Winter" | "Spring";
 
-export interface SeasonInfo {
-  season: Season;
-  emoji: string;
-}
-
 export interface UpcomingSeason {
   season: Season;
   emoji: string;
@@ -60,24 +55,14 @@ export const SEASON_STARTS: ReadonlyArray<{
   season: Season;
   emoji: string;
 }> = [
+  // Native-presentation glyphs throughout: the variation-selector forms (❄️
+  // U+2744+FE0F, ☀️ U+2600+FE0F) render lighter and airier than 🍂/🌷, which
+  // shows badly at the countdown rail's larger season size.
   { month: 3, season: "Autumn", emoji: "🍂" },
-  { month: 6, season: "Winter", emoji: "❄️" },
+  { month: 6, season: "Winter", emoji: "⛄" },
   { month: 9, season: "Spring", emoji: "🌷" },
-  { month: 12, season: "Summer", emoji: "☀️" },
+  { month: 12, season: "Summer", emoji: "🌞" },
 ];
-
-/**
- * The current Southern-Hemisphere season for `today`. Picks the latest season
- * whose start month (1-12) is at or before the current month; Jan/Feb fall
- * before March's entry and so wrap back to December's Summer.
- */
-export function currentSeason(today: Date): SeasonInfo {
-  const month = today.getMonth() + 1; // 1-12
-  const match =
-    [...SEASON_STARTS].reverse().find((s) => s.month <= month) ??
-    SEASON_STARTS[SEASON_STARTS.length - 1]; // Jan/Feb -> Summer (Dec)
-  return { season: match.season, emoji: match.emoji };
-}
 
 /**
  * All four upcoming season starts, soonest first. Each season's start date is

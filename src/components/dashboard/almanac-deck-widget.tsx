@@ -21,7 +21,6 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { formatTemp, sydneyTime } from "@/lib/utils";
 import {
-  currentSeason,
   daysSince,
   daysUntil,
   nextAnniversary,
@@ -38,8 +37,8 @@ import type {
 /* ---------------------------------------------------------------------------
  * The Almanac Deck — one card slot that rotates through the almanac facts
  * every 30 s: Moon Phases · Astrological Transits · Exchange Rates ·
- * Time on Earth · Countdowns · Season · Weather Gauges · Quote. Fixed height
- * so the layout never jumps between cards.
+ * Time on Earth · Countdowns · Weather Gauges · Quote. Fixed height so the
+ * layout never jumps between cards.
  * ------------------------------------------------------------------------- */
 
 const CYCLE_MS = 30_000;
@@ -541,25 +540,30 @@ function TimeBody({ today }: { today: Date }) {
   );
 }
 
-// The year as a line, today as a fixed ember dial at its centre. Anniversaries
-// and season starts enter from the right ("in N days"), drift toward the dial
-// as days pass, light up ember on the day itself, then recede left ("N days
-// ago") until they fall off the edge half a year later. Emoji sit ON the line
-// like beads on a rail (clear of the card's vertical clip); their text stacks
-// alternate above/below in x-order so near-coincident dates never collide.
+// The year as a line, today as a fixed ember filament at its centre.
+// Anniversaries and season starts enter from the right ("in N days"), drift
+// toward the filament as days pass, light up ember on the day itself, then
+// recede left ("N days ago") until they fall off the edge half a year later.
+// Emoji sit ON the line like beads on a rail (clear of the card's vertical
+// clip); their text stacks alternate above/below in x-order so near-coincident
+// dates never collide. Seasons ride the same rail on the same rules, but at a
+// larger bead size — they are the coarser tier of the year and read as such.
 function CountdownBody({ today }: { today: Date }) {
   const events = [
     ...COUNTDOWNS.map((c) => ({
       emoji: c.emoji,
       label: c.label,
       days: daysUntil(nextAnniversary(c.month, c.day, today), today),
+      season: false,
     })),
-    // Season starts from the same helper the Season card uses. A season
-    // starting today reports 365 days, which folds to offset 0 — "Today".
+    // Season starts. A season starting today reports 365 days, which folds to
+    // offset 0 — "Today". Tagged here, at the one point the two sources are
+    // still distinguishable, so the rail can size them as their own tier.
     ...upcomingSeasons(today).map((s) => ({
       emoji: s.emoji,
       label: s.season,
       days: s.days,
+      season: true,
     })),
   ]
     // Fold the yearly cycle onto ±half a year around today: an anniversary
@@ -573,9 +577,24 @@ function CountdownBody({ today }: { today: Date }) {
         className="absolute inset-x-0 top-1/2 h-px bg-white/[0.12] [mask-image:linear-gradient(to_right,transparent,black_24px,black_calc(100%_-_24px),transparent)]"
         aria-hidden
       />
-      {/* fixed centre dial — the "now" reference the markers drift through */}
+      {/* "Now" — an ember filament crossing the rail, the fixed reference the
+          markers drift through. Three layers: a soft bloom, the 1px filament
+          itself (brightest where it meets the rail, dissolving at both ends so
+          it reads as lit rather than drawn), and a pip on the crossing. The
+          bloom is a gradient, not a blur() filter, so the always-on kiosk keeps
+          the whole marker on the compositor. Unlike the dial it replaces, a
+          1px line survives an event landing on today — it runs past the emoji
+          instead of hiding behind it. */}
       <span
-        className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[2px] bg-[color:var(--accent-1)]"
+        className="absolute inset-y-0 left-1/2 w-[14px] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,var(--glow-1),transparent_70%)]"
+        aria-hidden
+      />
+      <span
+        className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[linear-gradient(to_bottom,transparent,var(--accent-1)_45%,var(--accent-1)_55%,transparent)]"
+        aria-hidden
+      />
+      <span
+        className="absolute left-1/2 top-1/2 h-[5px] w-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color:var(--accent-1)] shadow-[0_0_6px_2px_var(--glow-1)]"
         aria-hidden
       />
       {events.map((e, i) => {
@@ -588,13 +607,31 @@ function CountdownBody({ today }: { today: Date }) {
           : past
             ? `${-e.offset} days ago`
             : `in ${e.offset} days`;
+        // Seasons are the coarser tier of the year and run visibly larger than
+        // the anniversaries; within each tier the day itself steps up again.
+        const size = e.season
+          ? isToday
+            ? "text-[34px]"
+            : "text-[30px]"
+          : isToday
+            ? "text-[26px]"
+            : "text-[20px]";
+        // A 34px bead reaches ±17px about the rail, so the season tier needs one
+        // more step of clearance or it grazes its own caption.
+        const clearance = e.season
+          ? above
+            ? "bottom-1/2 mb-5"
+            : "top-1/2 mt-5"
+          : above
+            ? "bottom-1/2 mb-4"
+            : "top-1/2 mt-4";
         return (
           <Fragment key={e.label}>
             {/* the bead riding the rail */}
             <span
-              className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 leading-none ${
-                isToday ? "text-[26px]" : "text-[20px]"
-              } ${past ? "opacity-60" : ""}`}
+              className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 leading-none ${size} ${
+                past ? "opacity-60" : ""
+              }`}
               style={{ left: `${pct}%` }}
               aria-hidden
             >
@@ -602,9 +639,9 @@ function CountdownBody({ today }: { today: Date }) {
             </span>
             {/* its label, floated clear of the rail */}
             <div
-              className={`absolute flex -translate-x-1/2 flex-col items-center gap-1 whitespace-nowrap ${
-                above ? "bottom-1/2 mb-4" : "top-1/2 mt-4"
-              } ${past ? "opacity-60" : ""}`}
+              className={`absolute flex -translate-x-1/2 flex-col items-center gap-1 whitespace-nowrap ${clearance} ${
+                past ? "opacity-60" : ""
+              }`}
               style={{ left: `${pct}%` }}
             >
               <span
@@ -629,49 +666,6 @@ function CountdownBody({ today }: { today: Date }) {
           </Fragment>
         );
       })}
-    </div>
-  );
-}
-
-function SeasonBody({ today }: { today: Date }) {
-  const season = currentSeason(today);
-  // Soonest season is the headline; the rest of the cycle sits small on the right.
-  const [next, ...later] = upcomingSeasons(today);
-  return (
-    <div className="flex max-w-[680px] items-center justify-between gap-6 py-0.5">
-      {/* Current season is the star; the countdown rides beside it as support. */}
-      <span className="flex items-center gap-3">
-        <span className="text-[42px] leading-none" aria-hidden>
-          {season.emoji}
-        </span>
-        <span className="flex items-baseline gap-3">
-          <span className="text-[27px] font-semibold leading-none text-foreground">
-            {season.season}
-          </span>
-          <span className="flex items-baseline gap-1.5 text-[14px] text-foreground/60">
-            <span className="text-[15px] leading-none" aria-hidden>
-              {next.emoji}
-            </span>
-            <span className="font-mono text-[color:var(--accent-1)] num-tabular">
-              {next.days}
-            </span>{" "}
-            days until {next.season}
-          </span>
-        </span>
-      </span>
-      <span className="flex shrink-0 flex-col gap-1.5 text-[13px] text-foreground/60">
-        {later.map((s) => (
-          <span key={s.season} className="flex items-center gap-1.5">
-            <span className="text-[15px] leading-none" aria-hidden>
-              {s.emoji}
-            </span>
-            <span className="font-mono text-[color:var(--accent-1)] num-tabular">
-              {s.days}
-            </span>{" "}
-            days until {s.season}
-          </span>
-        ))}
-      </span>
     </div>
   );
 }
@@ -804,7 +798,6 @@ export function AlmanacDeckWidget() {
     { label: "Exchange Rates", node: <FxBody currency={currency} /> },
     { label: "Time on Earth", node: <TimeBody today={today} /> },
     { label: "Countdowns", node: <CountdownBody today={today} /> },
-    { label: "Season", node: <SeasonBody today={today} /> },
     { label: "Weather Gauges", node: <GaugesBody current={weather?.current} /> },
     { label: "Quote", node: <QuoteBody quote={quote} /> },
   ];
