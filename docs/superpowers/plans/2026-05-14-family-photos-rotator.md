@@ -8,6 +8,18 @@
 
 **Tech Stack:** Next.js 16.2.3 App Router, React 19, SWR 2.x, NextAuth v4, Node 20+ `fs.promises`, macOS `sips` via `child_process.execFile`.
 
+> **As-built deviations (reviewed 2026-09-22).** The tasks below are kept as written for the record; the shipped behaviour differs in these ways. Where the two disagree, the code wins — see [README → How the photo frame picks photos](../../../README.md#how-the-photo-frame-picks-photos-explained-for-a-10-year-old) for the plain-language rules.
+>
+> | Plan said | Shipped | Commit |
+> |---|---|---|
+> | Rotate every **30 s** | **20 s** (went 30 → 10 → 8 → 12 → 20 as the layout evolved) | `e79d679`, `3843091`, `06e1858`, `34ed2b3` |
+> | `object-contain` (letterbox, gradient bars) | `object-cover` (fills the frame, edges may crop) | `e79d679` |
+> | HEIC via macOS `sips` — "requires the dev server to run on macOS" | `heif-convert` (libheif), works on macOS and Linux; production runs on Linux | `7594b4d` |
+> | Response is `{ id }` only | `{ id, date, location }` — EXIF date + reverse-geocoded GPS, shown as a caption overlay | `498491f`, `e79d679` |
+> | No filtering beyond file extension | Photos tagged `veto` in Synology Photos (DB tag, synced every 6 h) **or** carrying an embedded XMP/IPTC `veto` keyword are skipped; up to 15 random re-picks per request, then `503 all-vetoed` and the widget holds its current frame | `4c9f7fe` |
+> | — | `exifr` must stay in `serverExternalPackages` or EXIF silently stops loading under Turbopack | `9403a25` |
+> | Task 5 offers approaches A/B/C | User chose **B** (`path.relative`) | `ce3cec1` |
+
 **Project note — no test runner:** This project has no Jest/Vitest/Playwright. "Tests" in this plan are **manual verifications** (curl, browser, console). Each task still follows define-behaviour → implement → verify → commit.
 
 **Learning-mode checkpoint:** Task 5 stops for the user to implement `isAllowedPhotoPath`. Do not skip past it.
