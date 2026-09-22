@@ -19,6 +19,14 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
+  session: {
+    strategy: "jwt",
+    // NextAuth defaults to 30 days. The kiosk never re-fetches the session
+    // (no focus changes, no reloads), so the cookie is only re-signed at page
+    // load — a short window means a forced Google re-login every month.
+    // 1 year sits under the 400-day browser cookie cap.
+    maxAge: 365 * 24 * 60 * 60,
+  },
   callbacks: {
     async signIn({ user }) {
       return user.email === process.env.ALLOWED_EMAIL;
